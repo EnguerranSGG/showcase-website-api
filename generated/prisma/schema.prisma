@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id    String      @id @default(uuid())
+  firstname  String
+  lastname   String
+  mail       String      @unique
+  password   String
+  created_at DateTime
+  updated_at DateTime
+  partners   Partner[]
+  times      Time[]
+  jobOffers  Job_offer[]
+  structures Structure[]
+  statistics Statistic[]
+  news       News[]
+  values     Value[]
+  jobs       Job[]
+  steps      Step[]
+  files      File[]
+}
+
+model Partner {
+  parteners_id Int      @id @default(autoincrement())
+  name         String
+  image_url    String
+  created_at   DateTime
+  updated_at   DateTime
+  user_id      String
+  user         User     @relation(fields: [user_id], references: [user_id])
+}
+
+model Time {
+  time_id           Int      @id @default(autoincrement())
+  year              Int
+  event_description String
+  created_at        DateTime
+  updated_at        DateTime
+  user_id           String
+  user              User     @relation(fields: [user_id], references: [user_id])
+}
+
+model Job_offer {
+  job_offer_id Int      @id @default(autoincrement())
+  name         String
+  job_type     String
+  city         String?
+  image_url    String?
+  link         String?
+  description  String
+  created_at   DateTime
+  updated_at   DateTime
+  user_id      String
+  user         User     @relation(fields: [user_id], references: [user_id])
+}
+
+model Structure {
+  structure_id Int      @id @default(autoincrement())
+  name         String
+  image_url    String?
+  description  String
+  address      String?
+  phone_number String?
+  missions     String?
+  link         String?
+  schedule     String?
+  created_at   DateTime
+  updated_at   DateTime
+  user_id      String
+  user         User     @relation(fields: [user_id], references: [user_id])
+}
+
+model Statistic {
+  statistic_id Int      @id @default(autoincrement())
+  label        String
+  value        Int
+  year         Int
+  created_at   DateTime
+  updated_at   DateTime
+  user_id      String
+  type_id      Int
+  user         User     @relation(fields: [user_id], references: [user_id])
+  type         Type     @relation(fields: [type_id], references: [type_id])
+}
+
+model News {
+  news_id     Int      @id @default(autoincrement())
+  name        String
+  image_url   String?
+  link        String?
+  description String
+  created_at  DateTime
+  updated_at  DateTime
+  user_id     String
+  user        User     @relation(fields: [user_id], references: [user_id])
+}
+
+model Value {
+  value_id   Int      @id @default(autoincrement())
+  name       String
+  image_url  String?
+  created_at DateTime
+  updated_at DateTime
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [user_id])
+}
+
+model Position {
+  position_id Int      @id @default(autoincrement())
+  name        String
+  created_at  DateTime
+  updated_at  DateTime
+  jobs        Job[]
+}
+
+model Job {
+  job_id      Int      @id @default(autoincrement())
+  function    String
+  created_at  DateTime
+  updated_at  DateTime
+  position_id Int
+  user_id     String
+  position    Position @relation(fields: [position_id], references: [position_id])
+  user        User     @relation(fields: [user_id], references: [user_id])
+}
+
+model Step {
+  step_id     Int      @id @default(autoincrement())
+  name        String
+  image_url   String?
+  description String
+  created_at  DateTime
+  updated_at  DateTime
+  user_id     String
+  path_id     Int
+  user        User     @relation(fields: [user_id], references: [user_id])
+  path        Path     @relation(fields: [path_id], references: [path_id])
+}
+
+model Path {
+  path_id    Int      @id @default(autoincrement())
+  name       String   @unique
+  created_at DateTime
+  updated_at DateTime
+  steps      Step[]
+}
+
+model File {
+  file_id    Int      @id @default(autoincrement())
+  name       String
+  file       Bytes
+  created_at DateTime
+  updated_at DateTime
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [user_id])
+}
+
+model Type {
+  type_id    Int         @id @default(autoincrement())
+  name       String
+  created_at DateTime
+  updated_at DateTime
+  statistics Statistic[]
+}
