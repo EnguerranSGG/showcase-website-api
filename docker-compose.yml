@@ -11,5 +11,19 @@ services:
       POSTGRES_DB: air-db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+    container_name: showcase-api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    restart: on-failure
+    env_file:
+      - .env
+    command: node dist/main
+
 volumes:
   postgres_data:
