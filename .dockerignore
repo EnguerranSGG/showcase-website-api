@@ -1,0 +1,51 @@
+# Repos Git
+.git
+.gitignore
+.github/
+
+# Docker files (facultatif : à garder dans build context si build multi-stage)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Dépendances
+node_modules/
+npm-debug.log
+.npm/
+
+# Build et cache
+dist/
+coverage/
+.nyc_output/
+*.log
+*~
+
+# Configs locales
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+.DS_Store
+
+# Docs
+README.md
+LICENSE
+CHANGELOG.md
+docs/
+
+# Tests
+test/
+**/*.spec.ts
+**/*.test.ts
+vitest.config.ts
+jest.config.js
+
+# Temp files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Autres configs
+nginx/
