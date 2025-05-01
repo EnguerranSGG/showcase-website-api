@@ -21,8 +21,8 @@ services:
     depends_on:
       - db
     restart: on-failure
-    env_file:
-      - .env
+    environment:
+      - DATABASE_URL=postgresql://air-admin:air-admin-password@db:5432/air-db
     command: node dist/main
 
 volumes:
