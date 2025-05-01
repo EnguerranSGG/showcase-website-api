@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: air-admin
+      POSTGRES_PASSWORD: air-admin-password
+      POSTGRES_DB: air-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      DATABASE_URL: postgres://air-admin:air-admin-password@db:5432/air-db
+      PRISMA_CLIENT_ENGINE_TYPE: library
+      PRISMA_DATABASE_TIMEOUT: 15000
+    expose:
+      - 3000
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:1.28
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+    networks:
+      - backend
+
+volumes:
+  postgres_data:
+
+networks:
+  backend:
