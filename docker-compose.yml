@@ -23,7 +23,7 @@ services:
     restart: on-failure
     environment:
       - DATABASE_URL=postgresql://air-admin:air-admin-password@db:5432/air-db
-    command: node dist/main
+    command: sh -c "npx prisma migrate deploy && node dist/main"
 
 volumes:
   postgres_data:
