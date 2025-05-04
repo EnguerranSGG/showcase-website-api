@@ -9,6 +9,7 @@ API backend pour un site vitrine, construite avec **NestJS**, **PostgreSQL**, **
 - **PostgreSQL** v16
 - **Prisma ORM**
 - **Docker / Docker Compose**
+- **Swagger** pour la documentation de l'API
 
 ---
 
@@ -32,6 +33,7 @@ docker-compose up --build
 ```
 
 - L’API est disponible sur [http://localhost:3000](http://localhost:3000)
+- La documentation Swagger est disponible sur [http://localhost:3000/api](http://localhost:3000/api)
 - PostgreSQL écoute sur `localhost:5433`
 
 ### 4. Accès à la base de données
@@ -96,5 +98,5 @@ Et modifie la configuration NestJS/Prisma en conséquence.
 
 - Le build production inclut `openssl` pour Prisma.
 - Prisma doit être généré dans le `Dockerfile` (fait via `npx prisma generate`).
-- Swagger est exposé via Nginx sur `/api`.
+- Swagger est exposé via Nginx sur `/api` (prod) et sur `/api` directement (dev).
 
