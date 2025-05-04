@@ -1,5 +1,6 @@
-# Stage 1: build
+# === Build Stage ===
 FROM node:20-slim AS builder
+
 WORKDIR /app
 
 COPY package*.json ./
@@ -7,23 +8,26 @@ RUN npm install
 
 COPY . .
 
-# Écrase le schema.prisma en y injectant le bon binaryTarget
-RUN sed -i 's/binaryTargets = \[.*\]/binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]/' prisma/schema.prisma
+# ✅ Permet à Prisma de connaître les cibles binaires pendant le build
+ARG PRISMA_BINARY_TARGETS
+ENV PRISMA_BINARY_TARGETS=$PRISMA_BINARY_TARGETS
 
 RUN npx prisma generate
 RUN npm run build
 
-# Stage 2: production
+# === Production Stage ===
 FROM node:20-slim AS runner
+
 WORKDIR /app
 
-# ✅ Installer netcat via netcat-openbsd (meilleur choix)
-RUN apt-get update && apt-get install -y netcat-openbsd openssl
+# ✅ Dépendances système nécessaires pour Prisma au runtime
+RUN apt-get update && apt-get install -y netcat-openbsd openssl && apt-get clean
 
+# ✅ Copie minimale pour un runtime plus léger
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-# ✅ Attente de la DB + migration + lancement du serveur
+# ✅ Lancer le serveur après avoir attendu que la base de données soit prête
 CMD sh -c "until nc -z db 5432; do echo '🕓 Waiting for DB...'; sleep 1; done; npx prisma migrate deploy && node dist/main"
