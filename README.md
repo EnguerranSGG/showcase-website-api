@@ -1,6 +1,6 @@
 # 🌐 Showcase API
 
-API backend pour un site vitrine, construite avec **NestJS**, **PostgreSQL**, **Docker** et **Prisma**.
+Backend pour un site vitrine, construit avec **NestJS**, **PostgreSQL**, **Prisma** et **Docker**.
 
 ## 🚀 Stack technique
 
@@ -9,7 +9,7 @@ API backend pour un site vitrine, construite avec **NestJS**, **PostgreSQL**, **
 - **PostgreSQL** v16
 - **Prisma ORM**
 - **Docker / Docker Compose**
-- **Swagger** pour la documentation de l'API
+- **Swagger** (via `/api`)
 
 ---
 
@@ -19,84 +19,100 @@ API backend pour un site vitrine, construite avec **NestJS**, **PostgreSQL**, **
 
 - Docker & Docker Compose installés
 
-### 2. Récupération du projet
+### 2. Cloner le projet
 
 ```bash
-git clone <url-du-depot>
+git clone https://github.com/accueil-insertion-rencontre/showcase-website-api.git
 cd showcase-api
-```
+````
 
-### 3. Lancement en développement
+### 3. Démarrer les services en dev
 
 ```bash
 docker-compose up --build
 ```
 
-- L’API est disponible sur [http://localhost:3000](http://localhost:3000)
-- La documentation Swagger est disponible sur [http://localhost:3000/api](http://localhost:3000/api)
-- PostgreSQL écoute sur `localhost:5433`
+* API : [http://localhost:3000](http://localhost:3000)
+* Swagger : [http://localhost:3000/api](http://localhost:3000/api)
+* PostgreSQL : `localhost:5433`
 
-### 4. Accès à la base de données
+### 4. Connexion à la base (via client type DBeaver, TablePlus…)
 
-Utilise un client comme DBeaver ou TablePlus avec les infos suivantes :
+* **Hôte** : `localhost`
+* **Port** : `5433`
+* **Utilisateur** : `air-admin`
+* **Mot de passe** : `air-admin-password`
+* **Base** : `air-db`
 
-- Hôte : `localhost`
-- Port : `5433`
-- Utilisateur : `air-admin`
-- Mot de passe : `air-admin-password`
-- Base : `air-db`
+### 5. Prisma (migrations / introspection)
 
-### 5. Prisma (optionnel si besoin de migrations)
+#### Générer le client Prisma
 
 ```bash
-docker exec -it showcase-api npx prisma migrate dev
+docker exec -it showcase-api npx prisma generate
 ```
 
----
+#### Créer une migration
+
+```bash
+docker exec -it showcase-api npx prisma migrate dev --name <nom>
+```
+
+> ⚠️ Les variables comme `PRISMA_BINARY_TARGETS` sont injectées automatiquement via `docker-compose.yml`.<br>
+> Si tu exécutes Prisma **hors Docker**, pense à les définir dans un fichier `.env`.
 
 ## 🏢 Environnement de production
 
 ### 1. Prérequis
 
-- Docker & Docker Compose
+* Docker & Docker Compose
 
-### 2. Lancement de l’API en production
+### 2. Lancer en production
 
 ```bash
 docker-compose -f docker-compose.prod.yml up --build -d
 ```
 
-- Le serveur sera exposé sur [http://localhost](http://localhost) via **nginx**
+* API : [http://localhost](http://localhost)
+* Swagger : [http://localhost/api](http://localhost/api)
 
-### 3. Accès à Swagger
+### 3. Services déployés
 
-```txt
-http://localhost/api
-```
-
-### 4. Composition production
-
-- `nginx`: sert le reverse proxy
-- `api`: build optimisé NestJS
-- `db`: base PostgreSQL persistante
+* `nginx` : reverse proxy HTTP
+* `api` : application NestJS optimisée
+* `db` : PostgreSQL avec volume persistant
 
 ---
 
-## ⚙️ Variables d'environnement
+## ⚙️ Variables d’environnement
 
-Pas besoin de `.env` local car les variables sont injectées directement via `docker-compose`. Si besoin de personnalisation locale, ajoute un fichier `.env` avec :
+Aucune `.env` nécessaire en environnement Dockerisé — tout est injecté par `docker-compose`.
+
+### Exemple `.env` pour un usage local (hors Docker) :
 
 ```dotenv
 DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db
+PRISMA_BINARY_TARGETS=["native"]
 ```
 
-Et modifie la configuration NestJS/Prisma en conséquence.
+> ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide.
 
 ---
 
-## 🛡️ Notes
+## 🛡️ Notes techniques
 
-- Le build production inclut `openssl` pour Prisma.
-- Prisma doit être généré dans le `Dockerfile` (fait via `npx prisma generate`).
-- Swagger est exposé via Nginx sur `/api` (prod) et sur `/api` directement (dev).
+* `openssl` est installé dans l’image Docker pour Prisma.
+* `npx prisma generate` est exécuté durant le build Docker.
+* Le conteneur `api` applique automatiquement les migrations (`migrate deploy`) au démarrage.
+* Swagger est exposé en `/api` grâce à **Nginx** en production.
+
+---
+
+## 🔎 Debug / logs
+
+```bash
+docker-compose logs -f api
+```
+
+
 
