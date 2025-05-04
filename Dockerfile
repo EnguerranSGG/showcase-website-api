@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y openssl
 COPY package*.json ./
 COPY prisma ./prisma
 RUN npm install
+
+ARG PRISMA_BINARY_TARGETS
+ENV PRISMA_BINARY_TARGETS=${PRISMA_BINARY_TARGETS}
 RUN npx prisma generate
 
 # Code source
@@ -31,6 +34,8 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
 # Re-générer le client Prisma pour assurer la compatibilité native (optionnel mais utile)
+ARG PRISMA_BINARY_TARGETS
+ENV PRISMA_BINARY_TARGETS=${PRISMA_BINARY_TARGETS}
 RUN npx prisma generate
 
 # Lancer l'API
