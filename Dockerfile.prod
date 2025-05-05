@@ -3,31 +3,44 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
+RUN --mount=type=cache,target=/root/.npm \
+    apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
-RUN npm install
+RUN --mount=type=cache,target=/root/.npm npm install
 
 COPY . .
 
-# ✅ Permet à Prisma de connaître les cibles binaires pendant le build
+# Générer le client Prisma (en respectant les binaryTargets définis en ENV)
 ARG PRISMA_BINARY_TARGETS
 ENV PRISMA_BINARY_TARGETS=$PRISMA_BINARY_TARGETS
-
 RUN npx prisma generate
+
+# Build de l'application
 RUN npm run build
+
 
 # === Production Stage ===
 FROM node:20-slim AS runner
 
 WORKDIR /app
 
-# ✅ Dépendances système nécessaires pour Prisma au runtime
-RUN apt-get update && apt-get install -y netcat-openbsd openssl && apt-get clean
+# ✅ Installer netcat avant de changer d'utilisateur
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
-# ✅ Copie minimale pour un runtime plus léger
+# ✅ Créer l'utilisateur appuser ensuite
+RUN addgroup --system app && adduser --system --ingroup app appuser
+
+# ✅ Copier les fichiers nécessaires
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-# ✅ Lancer le serveur après avoir attendu que la base de données soit prête
-CMD sh -c "until nc -z db 5432; do echo '🕓 Waiting for DB...'; sleep 1; done; npx prisma migrate deploy && node dist/main"
+# ✅ Changer les droits puis passer à appuser
+RUN chown -R appuser:app /app
+USER appuser
+
+ENV PORT=3000
+
+CMD sh -c "until nc -z db 5432; do echo '🕓 Waiting for DB...'; sleep 1; done; node dist/main"
