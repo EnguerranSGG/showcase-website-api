@@ -4,12 +4,12 @@ Backend pour un site vitrine, construit avec **NestJS**, **PostgreSQL**, **Prism
 
 ## 🚀 Stack technique
 
-- **Node.js** v20
-- **NestJS** avec Fastify
-- **PostgreSQL** v16
-- **Prisma ORM**
-- **Docker / Docker Compose**
-- **Swagger** (via `/api`)
+* **Node.js** v20
+* **NestJS** avec Fastify
+* **PostgreSQL** v16
+* **Prisma ORM**
+* **Docker / Docker Compose**
+* **Swagger** (via `/api`)
 
 ---
 
@@ -17,26 +17,26 @@ Backend pour un site vitrine, construit avec **NestJS**, **PostgreSQL**, **Prism
 
 ### 1. Prérequis
 
-- Docker & Docker Compose installés
+* Docker & Docker Compose installés
 
 ### 2. Cloner le projet
 
 ```bash
 git clone https://github.com/accueil-insertion-rencontre/showcase-website-api.git
-cd showcase-api
-````
+cd showcase-website-api
+```
 
-### 3. Démarrer les services en dev
+### 3. Lancer l’environnement de développement
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 * API : [http://localhost:3000](http://localhost:3000)
 * Swagger : [http://localhost:3000/api](http://localhost:3000/api)
 * PostgreSQL : `localhost:5433`
 
-### 4. Connexion à la base (via client type DBeaver, TablePlus…)
+### 4. Connexion à la base de données
 
 * **Hôte** : `localhost`
 * **Port** : `5433`
@@ -46,73 +46,83 @@ docker-compose up --build
 
 ### 5. Prisma (migrations / introspection)
 
+> Utilise Prisma uniquement via Docker, sauf si tu as correctement défini `PRISMA_BINARY_TARGETS` pour ta plateforme.
+
 #### Générer le client Prisma
 
 ```bash
-docker exec -it showcase-api npx prisma generate
+docker compose exec api npx prisma generate
 ```
 
 #### Créer une migration
 
 ```bash
-docker exec -it showcase-api npx prisma migrate dev --name <nom>
+docker compose exec api npx prisma migrate dev --name <nom>
 ```
 
-> ⚠️ Les variables comme `PRISMA_BINARY_TARGETS` sont injectées automatiquement via `docker-compose.yml`.<br>
-> Si tu exécutes Prisma **hors Docker**, pense à les définir dans un fichier `.env`.
+---
 
 ## 🏢 Environnement de production
 
 ### 1. Prérequis
 
-* Docker & Docker Compose
+* Docker & Docker Compose installés
+* Plateforme compatible (Mac Apple Silicon ou Linux)
 
-### 2. Lancer en production
+### 2. Déploiement de la base + migrations
 
 ```bash
-docker-compose -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.prod.yml run --rm api npx prisma migrate deploy
+```
+
+> Cela permet d’appliquer les migrations **avant** le lancement de l’environnement prod.
+
+### 3. Lancer les services en production
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
 ```
 
 * API : [http://localhost](http://localhost)
 * Swagger : [http://localhost/api](http://localhost/api)
 
-### 3. Services déployés
+### 4. Services inclus
 
 * `nginx` : reverse proxy HTTP
-* `api` : application NestJS optimisée
+* `api` : application NestJS optimisée, utilisateur non-root
 * `db` : PostgreSQL avec volume persistant
 
 ---
 
 ## ⚙️ Variables d’environnement
 
-Aucune `.env` nécessaire en environnement Dockerisé — tout est injecté par `docker-compose`.
+En environnement Dockerisé, tout est injecté via `docker-compose.yml`.
 
-### Exemple `.env` pour un usage local (hors Docker) :
+### Exemple `.env` (uniquement pour usage local hors Docker)
 
 ```dotenv
 DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db
 PRISMA_BINARY_TARGETS=["native"]
 ```
 
-> ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide.
+> ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide (ex : `["native"]`, `["linux-arm64-openssl-1.1.x"]`...).
 
 ---
 
-## 🛡️ Notes techniques
+## 🛠️ Spécificités techniques
 
-* `openssl` est installé dans l’image Docker pour Prisma.
-* `npx prisma generate` est exécuté durant le build Docker.
-* Le conteneur `api` applique automatiquement les migrations (`migrate deploy`) au démarrage.
-* Swagger est exposé en `/api` grâce à **Nginx** en production.
+* `openssl` est installé dans les conteneurs pour la compatibilité Prisma.
+* `npx prisma generate` est exécuté **durant le build Docker**.
+* Le conteneur `api` attend la base via `netcat` avant de démarrer.
+* Les `binaryTargets` sont gérés dynamiquement via `ARG` + `ENV` dans le `Dockerfile`.
+* Swagger est exposé via **Nginx** sur `/api`.
 
 ---
 
-## 🔎 Debug / logs
+## 🔎 Logs & debug
 
 ```bash
-docker-compose logs -f api
+docker compose logs -f api
 ```
-
 
 
