@@ -1,53 +1,79 @@
 # 🌐 Showcase API
 
-API backend pour un site vitrine, construite avec **NestJS**, **PostgreSQL**, **Docker** et **Prisma**.
+Backend pour un site vitrine, construit avec **NestJS**, **PostgreSQL**, **Prisma** et **Docker**.
 
 ## 🚀 Stack technique
 
-- **Node.js** v20
-- **NestJS** avec Fastify
-- **PostgreSQL** v16
-- **Prisma ORM**
-- **Docker / Docker Compose**
+* **Node.js** v20
+* **NestJS** avec Fastify
+* **PostgreSQL** v16
+* **Prisma ORM**
+* **Docker / Docker Compose**
+* **Swagger** (via `/api`)
 
 ---
 
-## 🌳 Environnement de développement
+## ✅ Prérequis
 
-### 1. Prérequis
+* Git installé
+* Docker & Docker Compose installés
 
-- Docker & Docker Compose installés
-
-### 2. Récupération du projet
+### 1. Cloner le projet
 
 ```bash
-git clone <url-du-depot>
-cd showcase-api
+git clone https://github.com/accueil-insertion-rencontre/showcase-website-api.git
+cd showcase-website-api
 ```
 
-### 3. Lancement en développement
+### 2. Avoir un fichier `.env` correctement configuré à la racine du projet
+
+Tu peux générer ce fichier automatiquement avec :
 
 ```bash
-docker-compose up --build
+echo "DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db" > .env
+echo "PRISMA_BINARY_TARGETS=[\"native\"]" >> .env
+echo "JWT_ACCESS_SECRET='$(openssl rand -base64 64)'" >> .env
+echo "JWT_REFRESH_SECRET='$(openssl rand -base64 64)'" >> .env
 ```
 
-- L’API est disponible sur [http://localhost:3000](http://localhost:3000)
-- PostgreSQL écoute sur `localhost:5433`
+> ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide (ex : `["native"]`, `["linux-arm64-openssl-1.1.x"]`).
+>
+> ⚠️ Le fichier `.env` est **obligatoire**, même avec Docker, car les variables ne sont pas hardcodées dans l'image.
 
-### 4. Accès à la base de données
+---
 
-Utilise un client comme DBeaver ou TablePlus avec les infos suivantes :
-
-- Hôte : `localhost`
-- Port : `5433`
-- Utilisateur : `air-admin`
-- Mot de passe : `air-admin-password`
-- Base : `air-db`
-
-### 5. Prisma (optionnel si besoin de migrations)
+### 2. Lancer l’environnement de développement
 
 ```bash
-docker exec -it showcase-api npx prisma migrate dev
+docker compose up --build
+```
+
+* API : [http://localhost:3000](http://localhost:3000)
+* Swagger : [http://localhost:3000/api](http://localhost:3000/api)
+* PostgreSQL : `localhost:5433`
+
+### 3. Connexion à la base de données
+
+* **Hôte** : `localhost`
+* **Port** : `5433`
+* **Utilisateur** : `air-admin`
+* **Mot de passe** : `air-admin-password`
+* **Base** : `air-db`
+
+### 4. Prisma (migrations / introspection)
+
+> Utilise Prisma uniquement via Docker, sauf si tu as correctement défini `PRISMA_BINARY_TARGETS` pour ta plateforme.
+
+#### Générer le client Prisma
+
+```bash
+docker compose exec api npx prisma generate
+```
+
+#### Créer une migration
+
+```bash
+docker compose exec api npx prisma migrate dev --name <nom>
 ```
 
 ---
@@ -56,45 +82,66 @@ docker exec -it showcase-api npx prisma migrate dev
 
 ### 1. Prérequis
 
-- Docker & Docker Compose
+* Docker & Docker Compose installés
+* Plateforme compatible (Mac Apple Silicon ou Linux)
 
-### 2. Lancement de l’API en production
+### 2. Déploiement de la base + migrations
 
 ```bash
-docker-compose -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.prod.yml run --rm api npx prisma migrate deploy
 ```
 
-- Le serveur sera exposé sur [http://localhost](http://localhost) via **nginx**
+> Cela permet d’appliquer les migrations **avant** le lancement de l’environnement prod.
 
-### 3. Accès à Swagger
+### 3. Lancer les services en production
 
-```txt
-http://localhost/api
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
 ```
 
-### 4. Composition production
+* API : [http://localhost](http://localhost)
+* Swagger : [http://localhost/api](http://localhost/api)
 
-- `nginx`: sert le reverse proxy
-- `api`: build optimisé NestJS
-- `db`: base PostgreSQL persistante
+### 4. Services inclus
+
+* `nginx` : reverse proxy HTTP
+* `api` : application NestJS optimisée, utilisateur non-root
+* `db` : PostgreSQL avec volume persistant
 
 ---
 
-## ⚙️ Variables d'environnement
+## ⚙️ Variables d’environnement
 
-Pas besoin de `.env` local car les variables sont injectées directement via `docker-compose`. Si besoin de personnalisation locale, ajoute un fichier `.env` avec :
+En environnement Dockerisé, tout est injecté via `docker-compose.yml`. Toutefois, un fichier `.env` est requis localement **et** utilisé par Docker.
 
-```dotenv
-DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db
+### Générer un `JWT_SECRET` sécurisé
+
+Utilise cette commande pour générer une clé aléatoire :
+
+```bash
+openssl rand -base64 64
 ```
 
-Et modifie la configuration NestJS/Prisma en conséquence.
+> 📌 Copie-colle la sortie dans ton fichier `.env` :
+>
+> ```dotenv
+> JWT_SECRET=vraimentlonguetresaleatoire...
+> ```
 
 ---
 
-## 🛡️ Notes
+## 🛠️ Spécificités techniques
 
-- Le build production inclut `openssl` pour Prisma.
-- Prisma doit être généré dans le `Dockerfile` (fait via `npx prisma generate`).
-- Swagger est exposé via Nginx sur `/api`.
+* `openssl` est installé dans les conteneurs pour la compatibilité Prisma.
+* `npx prisma generate` est exécuté **durant le build Docker**.
+* Le conteneur `api` attend la base via `netcat` avant de démarrer.
+* Les `binaryTargets` sont gérés dynamiquement via `ARG` + `ENV` dans le `Dockerfile`.
+* Swagger est exposé via **Nginx** sur `/api`.
 
+---
+
+## 🔎 Logs & debug
+
+```bash
+docker compose logs -f api
+```

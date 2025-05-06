@@ -6,7 +6,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
+  binaryTargets = env("PRISMA_BINARY_TARGETS")
 }
 
 datasource db {
@@ -15,11 +15,13 @@ datasource db {
 }
 
 model User {
+  @@map("users")
   user_id    String   @id @default(uuid())
   firstname  String
   lastname   String
   mail       String   @unique
   password   String
+  refreshToken String?
   created_at DateTime
   updated_at DateTime
   partners   Partner[]
@@ -35,6 +37,7 @@ model User {
 }
 
 model Partner {
+  @@map("partners")
   parteners_id Int    @id @default(autoincrement())
   name         String
   image_url    String
@@ -45,6 +48,7 @@ model Partner {
 }
 
 model Time {
+  @@map("times")
   time_id           Int    @id @default(autoincrement())
   year              Int
   event_description String
@@ -55,6 +59,7 @@ model Time {
 }
 
 model Job_offer {
+  @@map("job_offers")
   job_offer_id Int    @id @default(autoincrement())
   name         String
   job_type     String
@@ -69,6 +74,7 @@ model Job_offer {
 }
 
 model Structure {
+  @@map("structures")
   structure_id  Int     @id @default(autoincrement())
   name          String
   image_url     String?
@@ -85,6 +91,7 @@ model Structure {
 }
 
 model Statistic {
+  @@map("statistics")
   statistic_id Int    @id @default(autoincrement())
   label        String
   value        Int
@@ -98,6 +105,7 @@ model Statistic {
 }
 
 model News {
+  @@map("news")
   news_id     Int     @id @default(autoincrement())
   name        String
   image_url   String?
@@ -110,6 +118,7 @@ model News {
 }
 
 model Value {
+  @@map("values")
   value_id    Int     @id @default(autoincrement())
   name        String
   image_url   String?
@@ -120,6 +129,7 @@ model Value {
 }
 
 model Position {
+  @@map("positions")
   position_id Int     @id @default(autoincrement())
   name        String
   created_at  DateTime
@@ -128,6 +138,7 @@ model Position {
 }
 
 model Job {
+  @@map("jobs")
   job_id      Int     @id @default(autoincrement())
   function    String
   created_at  DateTime
@@ -139,6 +150,7 @@ model Job {
 }
 
 model Step {
+  @@map("steps")
   step_id     Int     @id @default(autoincrement())
   name        String
   image_url   String?
@@ -152,6 +164,7 @@ model Step {
 }
 
 model Path {
+  @@map("paths")
   path_id    Int     @id @default(autoincrement())
   name       String  @unique
   created_at DateTime
@@ -160,6 +173,7 @@ model Path {
 }
 
 model File {
+  @@map("files")
   file_id    Int     @id @default(autoincrement())
   name       String
   file       Bytes
@@ -170,6 +184,7 @@ model File {
 }
 
 model Type {
+  @@map("types")
   type_id    Int     @id @default(autoincrement())
   name       String
   created_at DateTime

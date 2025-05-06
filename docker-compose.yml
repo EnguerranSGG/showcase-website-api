@@ -13,8 +13,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   api:
+    env_file: .env
     build:
       context: .
+      args:
+        PRISMA_BINARY_TARGETS: '["native"]'
     container_name: showcase-api
     ports:
       - "3000:3000"
@@ -22,8 +25,10 @@ services:
       - db
     restart: on-failure
     environment:
-      - DATABASE_URL=postgresql://air-admin:air-admin-password@db:5432/air-db
-    command: node dist/main
+      DATABASE_URL: postgresql://air-admin:air-admin-password@db:5432/air-db
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+    command: sh -c "npx prisma migrate deploy && node dist/main"
 
 volumes:
   postgres_data:
