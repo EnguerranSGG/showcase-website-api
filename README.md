@@ -13,20 +13,35 @@ Backend pour un site vitrine, construit avec **NestJS**, **PostgreSQL**, **Prism
 
 ---
 
-## 🌳 Environnement de développement
+## ✅ Prérequis
 
-### 1. Prérequis
-
+* Git installé
 * Docker & Docker Compose installés
 
-### 2. Cloner le projet
+### 1. Cloner le projet
 
 ```bash
 git clone https://github.com/accueil-insertion-rencontre/showcase-website-api.git
 cd showcase-website-api
 ```
 
-### 3. Lancer l’environnement de développement
+### 2. Avoir un fichier `.env` correctement configuré à la racine du projet
+
+Tu peux générer ce fichier automatiquement avec :
+
+```bash
+echo "DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db" > .env
+echo "PRISMA_BINARY_TARGETS=[\"native\"]" >> .env
+echo "JWT_SECRET='$(openssl rand -base64 64)'" >> .env
+```
+
+> ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide (ex : `["native"]`, `["linux-arm64-openssl-1.1.x"]`).
+>
+> ⚠️ Le fichier `.env` est **obligatoire**, même avec Docker, car les variables ne sont pas hardcodées dans l'image.
+
+---
+
+### 2. Lancer l’environnement de développement
 
 ```bash
 docker compose up --build
@@ -36,7 +51,7 @@ docker compose up --build
 * Swagger : [http://localhost:3000/api](http://localhost:3000/api)
 * PostgreSQL : `localhost:5433`
 
-### 4. Connexion à la base de données
+### 3. Connexion à la base de données
 
 * **Hôte** : `localhost`
 * **Port** : `5433`
@@ -44,7 +59,7 @@ docker compose up --build
 * **Mot de passe** : `air-admin-password`
 * **Base** : `air-db`
 
-### 5. Prisma (migrations / introspection)
+### 4. Prisma (migrations / introspection)
 
 > Utilise Prisma uniquement via Docker, sauf si tu as correctement défini `PRISMA_BINARY_TARGETS` pour ta plateforme.
 
@@ -96,16 +111,21 @@ docker compose -f docker-compose.prod.yml up --build -d
 
 ## ⚙️ Variables d’environnement
 
-En environnement Dockerisé, tout est injecté via `docker-compose.yml`.
+En environnement Dockerisé, tout est injecté via `docker-compose.yml`. Toutefois, un fichier `.env` est requis localement **et** utilisé par Docker.
 
-### Exemple `.env` (uniquement pour usage local hors Docker)
+### Générer un `JWT_SECRET` sécurisé
 
-```dotenv
-DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db
-PRISMA_BINARY_TARGETS=["native"]
+Utilise cette commande pour générer une clé aléatoire :
+
+```bash
+openssl rand -base64 64
 ```
 
-> ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide (ex : `["native"]`, `["linux-arm64-openssl-1.1.x"]`...).
+> 📌 Copie-colle la sortie dans ton fichier `.env` :
+>
+> ```dotenv
+> JWT_SECRET=vraimentlonguetresaleatoire...
+> ```
 
 ---
 
@@ -124,5 +144,3 @@ PRISMA_BINARY_TARGETS=["native"]
 ```bash
 docker compose logs -f api
 ```
-
-
