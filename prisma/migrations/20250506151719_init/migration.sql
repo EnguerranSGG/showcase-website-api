@@ -5,6 +5,7 @@ CREATE TABLE "users" (
     "lastname" TEXT NOT NULL,
     "mail" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "refreshToken" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
