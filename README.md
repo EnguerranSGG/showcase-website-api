@@ -32,7 +32,8 @@ Tu peux générer ce fichier automatiquement avec :
 ```bash
 echo "DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db" > .env
 echo "PRISMA_BINARY_TARGETS=[\"native\"]" >> .env
-echo "JWT_SECRET='$(openssl rand -base64 64)'" >> .env
+echo "JWT_ACCESS_SECRET='$(openssl rand -base64 64)'" >> .env
+echo "JWT_REFRESH_SECRET='$(openssl rand -base64 64)'" >> .env
 ```
 
 > ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide (ex : `["native"]`, `["linux-arm64-openssl-1.1.x"]`).

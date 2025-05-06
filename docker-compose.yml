@@ -26,7 +26,8 @@ services:
     restart: on-failure
     environment:
       DATABASE_URL: postgresql://air-admin:air-admin-password@db:5432/air-db
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
     command: sh -c "npx prisma migrate deploy && node dist/main"
 
 volumes:

@@ -19,7 +19,8 @@ services:
         PRISMA_BINARY_TARGETS: '["linux-musl","linux-arm64-openssl-1.1.x"]'
     environment:
       DATABASE_URL: postgres://air-admin:air-admin-password@db:5432/air-db
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
     expose:
       - 3000
     depends_on:
