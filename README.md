@@ -25,15 +25,23 @@ git clone https://github.com/accueil-insertion-rencontre/showcase-website-api.gi
 cd showcase-website-api
 ```
 
-### 2. Avoir un fichier `.env` correctement configuré à la racine du projet
+### 2. Avoir un fichier `.env` et un fichier `.env.prod` correctement configuré à la racine du projet
 
-Tu peux générer ce fichier automatiquement avec :
+Tu peux générer ces fichiers automatiquement avec :
 
 ```bash
 echo "DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db" > .env
 echo "PRISMA_BINARY_TARGETS=[\"native\"]" >> .env
 echo "JWT_ACCESS_SECRET='$(openssl rand -base64 64)'" >> .env
 echo "JWT_REFRESH_SECRET='$(openssl rand -base64 64)'" >> .env
+echo "NODE_ENV='development'" >> .env
+echo "LOG_LEVEL='debug'" >> .env
+echo "DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db" > .env.prod
+echo "PRISMA_BINARY_TARGETS=[\"native\"]" >> .env.prod
+echo "JWT_ACCESS_SECRET='$(openssl rand -base64 64)'" >> .env.prod
+echo "JWT_REFRESH_SECRET='$(openssl rand -base64 64)'" >> .env.prod
+echo "NODE_ENV='production'" >> .env.prod
+echo "LOG_LEVEL='info'" >> .env.prod
 ```
 
 > ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide (ex : `["native"]`, `["linux-arm64-openssl-1.1.x"]`).
