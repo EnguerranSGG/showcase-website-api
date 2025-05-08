@@ -11,13 +11,14 @@ services:
       - backend
 
   api:
-    env_file: .env
+    env_file: .env.prod
     build:
       context: .
       dockerfile: Dockerfile.prod
       args:
         PRISMA_BINARY_TARGETS: '["linux-musl","linux-arm64-openssl-1.1.x"]'
     environment:
+      NODE_ENV: production
       DATABASE_URL: postgres://air-admin:air-admin-password@db:5432/air-db
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}

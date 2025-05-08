@@ -25,6 +25,7 @@ services:
       - db
     restart: on-failure
     environment:
+      NODE_ENV: development
       DATABASE_URL: postgresql://air-admin:air-admin-password@db:5432/air-db
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
