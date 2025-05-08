@@ -4,6 +4,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { LoggerService } from 'src/common/logger/logger.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -11,15 +12,20 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private logger: LoggerService
     ) {}
 
   async signup(dto: RegisterDto) {
+
+    this.logger.log(`Tentative d'inscription pour l'email : ${dto.mail}`);
+
     const userExists = await this.prisma.user.findUnique({
       where: { mail: dto.mail },
     });
 
     if (userExists) {
+      this.logger.warn(`Email déjà utilisé : ${dto.mail}`);
       throw new ConflictException('Email déjà utilisé');
     }
 
@@ -36,6 +42,8 @@ export class AuthService {
       },
     });
 
+    this.logger.log(`Nouvel utilisateur créé : ${user.mail}`);
+
     const tokens = await this.getTokens(user.user_id, user.mail);
     await this.refreshToken(user.user_id, tokens.refreshToken);
 
@@ -49,18 +57,25 @@ export class AuthService {
     };
   }
   async login(dto: LoginDto) {
+
+    this.logger.log(`Tentative de connexion pour : ${dto.mail}`);
+
     const user = await this.prisma.user.findUnique({
       where: { mail: dto.mail },
     });
   
     if (!user) {
+      this.logger.warn(`Email inconnu : ${dto.mail}`);
       throw new UnauthorizedException('Identifiants invalides');
     }
   
     const passwordValid = await bcrypt.compare(dto.password, user.password);
     if (!passwordValid) {
+      this.logger.warn(`Mot de passe invalide pour : ${dto.mail}`);
       throw new UnauthorizedException('Identifiants invalides');
     }
+
+    this.logger.log(`Connexion réussie pour : ${dto.mail}`);
   
     const tokens = await this.getTokens(user.user_id, user.mail);
     await this.refreshToken(user.user_id, tokens.refreshToken);
@@ -74,6 +89,8 @@ export class AuthService {
       where: { user_id: userId },
       data: { refreshToken: null },
     });
+
+    this.logger.log(`Déconnexion réussie !`);
   }  
 
   async refreshToken(userId: string, refreshToken: string) {
