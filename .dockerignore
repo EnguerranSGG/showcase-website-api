@@ -22,7 +22,6 @@ coverage/
 
 # Configs locales
 .env
-.env.*
 !.env.example
 .vscode/
 .idea/
