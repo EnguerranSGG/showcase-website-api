@@ -14,15 +14,24 @@ RUN apt-get update \
 # Copie et installation des dépendances applicatives
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm install --omit=dev
+RUN npm ci
 
 # Génération Prisma client une seule fois ici (pas besoin en prod si généré ici)
 ARG PRISMA_BINARY_TARGETS
+ARG ADMIN_EMAIL
+ARG ADMIN_PASSWORD
+ARG DATABASE_URL_DOCKER
+
+ENV DATABASE_URL=${DATABASE_URL}
+ENV ADMIN_EMAIL=${ADMIN_EMAIL}
+ENV ADMIN_PASSWORD=${ADMIN_PASSWORD}
 ENV PRISMA_BINARY_TARGETS=${PRISMA_BINARY_TARGETS}
+
 RUN npx prisma generate
 
 # Copie du reste du code source et build
 COPY . .
+COPY .env .env
 RUN npm run build
 
 # === Production Stage ===
@@ -39,6 +48,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Copier uniquement ce qui est nécessaire au runtime
+COPY --chown=appuser:app --from=builder /app/.env .env
 COPY --chown=appuser:app --from=builder /app/package*.json ./
 COPY --chown=appuser:app --from=builder /app/node_modules ./node_modules
 COPY --chown=appuser:app --from=builder /app/dist ./dist
