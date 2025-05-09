@@ -3,23 +3,23 @@ import { logger } from './logger';
 
 @Injectable()
 export class LoggerService implements NestLoggerService {
-  log(message: string) {
-    logger.info(message);
+  log(message: any, context?: string) {
+    logger.info({ msg: message, context });
   }
 
-  error(message: string, trace?: string) {
-    logger.error({ trace }, message);
+  error(message: any, trace?: string, context?: string) {
+    logger.error({ msg: message, trace, context });
   }
 
-  warn(message: string) {
-    logger.warn(message);
+  warn(message: any, context?: string) {
+    logger.warn({ msg: message, context });
   }
 
-  debug(message: string) {
-    logger.debug(message);
+  debug(message: any, context?: string) {
+    logger.debug({ msg: message, context });
   }
 
-  verbose(message: string) {
-    logger.info(message);
+  verbose(message: any, context?: string) {
+    logger.trace({ msg: message, context });
   }
 }

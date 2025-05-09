@@ -6,8 +6,8 @@ import {
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggerService } from './common/logger/logger.service';
-import pinoHttp from 'pino-http';
-import { logger } from './common/logger/logger';
+
+import { PrismaClient } from '@prisma/client';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -16,10 +16,16 @@ async function bootstrap() {
     { logger: false },
   );
 
+  const prisma = new PrismaClient();
+  await prisma.$connect();
+  await prisma.$disconnect();
+
+  console.log('NODE_ENV =', process.env.NODE_ENV);
+
   const loggerService = app.get(LoggerService);
   app.useLogger(loggerService);
 
-  app.use(pinoHttp({ logger }));
+  loggerService.log('LoggerService fonctionne ✅');
 
   const config = new DocumentBuilder()
     .setTitle('Showcase API')
