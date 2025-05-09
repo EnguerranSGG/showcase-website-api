@@ -14,26 +14,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model User {
   @@map("users")
-  user_id    String   @id @default(uuid())
-  firstname  String
-  lastname   String
-  mail       String   @unique
-  password   String
+  user_id      String   @id @default(uuid())
+  firstname    String
+  lastname     String
+  mail         String   @unique
+  password     String
+  role         Role     @default(USER)  
   refreshToken String?
-  created_at DateTime
-  updated_at DateTime
-  partners   Partner[]
-  times      Time[]
-  jobOffers  Job_offer[]
-  structures Structure[]
-  statistics Statistic[]
-  news       News[]
-  values     Value[]
-  jobs       Job[]
-  steps      Step[]
-  files      File[]
+  created_at   DateTime
+  updated_at   DateTime
+  partners     Partner[]
+  times        Time[]
+  jobOffers    Job_offer[]
+  structures   Structure[]
+  statistics   Statistic[]
+  news         News[]
+  values       Value[]
+  jobs         Job[]
+  steps        Step[]
+  files        File[]
 }
 
 model Partner {
