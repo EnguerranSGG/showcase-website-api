@@ -10,10 +10,6 @@ async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
-  console.log(`Mot de passe brut à hasher :`, adminPassword);
-
-  console.log(`Admin à créer : ${adminEmail}`);
-
   if (!adminEmail || !adminPassword) {
     throw new Error('ADMIN_EMAIL et ADMIN_PASSWORD doivent être définis dans le .env');
   }
