@@ -8,6 +8,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtConfig } from './jwt.config'; 
 import { AccessTokenStrategy } from './stratgies/accessToken.strategy';
 import { RefreshTokenStrategy } from './stratgies/refreshToken.strategy';
+import { LoggerService } from 'src/common/logger/logger.service';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { RefreshTokenStrategy } from './stratgies/refreshToken.strategy';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get('ACCESS_TOKEN_SECRET'),
+        secret: config.get('JWT_ACCESS_SECRET'),
         signOptions: {
           expiresIn: '1h',
         },
@@ -24,7 +26,7 @@ import { RefreshTokenStrategy } from './stratgies/refreshToken.strategy';
     }),
   ],
   providers: [AuthService, PrismaService, JwtConfig, 
-    AccessTokenStrategy, RefreshTokenStrategy],
+    AccessTokenStrategy, RefreshTokenStrategy, RolesGuard, LoggerService],
   controllers: [AuthController],
 })
 export class AuthModule {}

@@ -16,7 +16,7 @@ export class AuthService {
     private logger: LoggerService
     ) {}
 
-  async signup(dto: RegisterDto) {
+  async addUser(dto: RegisterDto) {
 
     this.logger.log(`Tentative d'inscription pour l'email : ${dto.mail}`);
 
@@ -44,7 +44,7 @@ export class AuthService {
 
     this.logger.log(`Nouvel utilisateur créé : ${user.mail}`);
 
-    const tokens = await this.getTokens(user.user_id, user.mail);
+    const tokens = await this.getTokens(user.user_id, user.mail, user.role);
     await this.refreshToken(user.user_id, tokens.refreshToken);
 
     return {
@@ -57,32 +57,33 @@ export class AuthService {
     };
   }
   async login(dto: LoginDto) {
-
-    this.logger.log(`Tentative de connexion pour : ${dto.mail}`);
-
+    this.logger.log(`Tentative de connexion pour : ${dto.mail}`, 'AuthService');
+  
     const user = await this.prisma.user.findUnique({
       where: { mail: dto.mail },
     });
   
+    this.logger.debug(`Mail reçu : ${dto.mail}`, 'AuthService');
+  
     if (!user) {
-      this.logger.warn(`Email inconnu : ${dto.mail}`);
       throw new UnauthorizedException('Identifiants invalides');
     }
-  
+    
     const passwordValid = await bcrypt.compare(dto.password, user.password);
+    
     if (!passwordValid) {
-      this.logger.warn(`Mot de passe invalide pour : ${dto.mail}`);
+      this.logger.warn(`Mot de passe invalide pour : ${dto.mail}`, 'AuthService');
       throw new UnauthorizedException('Identifiants invalides');
     }
-
-    this.logger.log(`Connexion réussie pour : ${dto.mail}`);
   
-    const tokens = await this.getTokens(user.user_id, user.mail);
+    this.logger.log(`Connexion réussie pour : ${dto.mail}`, 'AuthService');
+  
+    const tokens = await this.getTokens(user.user_id, user.mail, user.role);
     await this.refreshToken(user.user_id, tokens.refreshToken);
-
+  
     return tokens;
-
   }
+  
 
   async logout(userId: string) {
     await this.prisma.user.update({
@@ -101,12 +102,11 @@ export class AuthService {
     });
   } 
 
-  async getTokens(userId: string, mail: string) {
+  async getTokens(userId: string, mail: string, role: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: userId,
-          mail,
+          sub: userId, mail, role
         },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
