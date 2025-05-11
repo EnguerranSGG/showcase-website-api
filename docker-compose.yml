@@ -17,7 +17,6 @@ services:
     build:
       context: .
       args:
-        PRISMA_BINARY_TARGETS: '["native"]'
         ADMIN_EMAIL: ${ADMIN_EMAIL}
         ADMIN_PASSWORD: ${ADMIN_PASSWORD}
         DATABASE_URL: postgresql://air-admin:air-admin-password@db:5432/air-db
@@ -33,6 +32,6 @@ services:
       DATABASE_URL: postgresql://air-admin:air-admin-password@db:5432/air-db
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      
+
 volumes:
   postgres_data:
