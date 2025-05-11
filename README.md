@@ -1,3 +1,12 @@
+Voici la version mise à jour de ton README incluant le **déploiement complet en production** avec :
+
+* build propre,
+* démarrage des containers,
+* migration Prisma,
+* exécution du seed.
+
+---
+
 # 🌐 Showcase API
 
 Backend pour un site vitrine, construit avec **NestJS**, **PostgreSQL**, **Prisma** et **Docker**.
@@ -25,35 +34,47 @@ git clone https://github.com/accueil-insertion-rencontre/showcase-website-api.gi
 cd showcase-website-api
 ```
 
-### 2. Avoir un fichier `.env` et un fichier `.env.prod` correctement configuré à la racine du projet
+### 2. Avoir un fichier `.env` et un fichier `.env.prod` correctement configurés à la racine du projet
 
 Tu peux générer ces fichiers automatiquement avec :
 
 ```bash
 echo "DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db" > .env
-echo "PRISMA_BINARY_TARGETS=[\"native\"]" >> .env
 echo "JWT_ACCESS_SECRET='$(openssl rand -base64 64)'" >> .env
 echo "JWT_REFRESH_SECRET='$(openssl rand -base64 64)'" >> .env
 echo "NODE_ENV='development'" >> .env
 echo "LOG_LEVEL='debug'" >> .env
-echo "DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5433/air-db" > .env.prod
-echo "PRISMA_BINARY_TARGETS=[\"native\"]" >> .env.prod
+echo "ADMIN_EMAIL=emailachanger@xyz.com" >> .env
+echo "ADMIN_PASSWORD=motdepassedevotrechoix" >> .env
+
+echo "DATABASE_URL=postgresql://air-admin:air-admin-password@localhost:5432/air-db" > .env.prod
 echo "JWT_ACCESS_SECRET='$(openssl rand -base64 64)'" >> .env.prod
 echo "JWT_REFRESH_SECRET='$(openssl rand -base64 64)'" >> .env.prod
 echo "NODE_ENV='production'" >> .env.prod
 echo "LOG_LEVEL='info'" >> .env.prod
+echo "ADMIN_EMAIL=emailachanger@xyz.com" >> .env.prod
+echo "ADMIN_PASSWORD=motdepassedevotrechoix" >> .env.prod
 ```
 
-> ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide (ex : `["native"]`, `["linux-arm64-openssl-1.1.x"]`).
->
+> ⚠️ `PRISMA_BINARY_TARGETS` doit être une chaîne JSON valide.
 > ⚠️ Le fichier `.env` est **obligatoire**, même avec Docker, car les variables ne sont pas hardcodées dans l'image.
 
 ---
 
-### 2. Lancer l’environnement de développement
+## 🧪 Environnement de développement
+
+### 1. Lancer les services
 
 ```bash
-docker compose up --build
+docker compose build --no-cache
+docker compose up
+```
+
+### 2. Appliquer les migrations et insérer les données de test
+
+```bash
+docker compose exec api npx prisma migrate deploy
+docker compose exec api npm run seed
 ```
 
 * API : [http://localhost:3000](http://localhost:3000)
@@ -68,43 +89,28 @@ docker compose up --build
 * **Mot de passe** : `air-admin-password`
 * **Base** : `air-db`
 
-### 4. Prisma (migrations / introspection)
-
-> Utilise Prisma uniquement via Docker, sauf si tu as correctement défini `PRISMA_BINARY_TARGETS` pour ta plateforme.
-
-#### Générer le client Prisma
-
-```bash
-docker compose exec api npx prisma generate
-```
-
-#### Créer une migration
-
-```bash
-docker compose exec api npx prisma migrate dev --name <nom>
-```
-
 ---
 
 ## 🏢 Environnement de production
 
-### 1. Prérequis
-
-* Docker & Docker Compose installés
-* Plateforme compatible (Mac Apple Silicon ou Linux)
-
-### 2. Déploiement de la base + migrations
+### 1. Build clean + déploiement
 
 ```bash
-docker compose -f docker-compose.prod.yml run --rm api npx prisma migrate deploy
+docker compose -f docker-compose.prod.yml down -v
+docker compose -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml up -d
 ```
 
-> Cela permet d’appliquer les migrations **avant** le lancement de l’environnement prod.
-
-### 3. Lancer les services en production
+### 2. Appliquer les migrations Prisma
 
 ```bash
-docker compose -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.prod.yml exec api npx prisma migrate deploy
+```
+
+### 3. Exécuter le script de seed
+
+```bash
+docker compose -f docker-compose.prod.yml exec api npm run seed
 ```
 
 * API : [http://localhost](http://localhost)
@@ -120,31 +126,23 @@ docker compose -f docker-compose.prod.yml up --build -d
 
 ## ⚙️ Variables d’environnement
 
-En environnement Dockerisé, tout est injecté via `docker-compose.yml`. Toutefois, un fichier `.env` est requis localement **et** utilisé par Docker.
+En environnement Dockerisé, tout est injecté via `docker-compose.yml`. Un fichier `.env` local est requis **et** utilisé pendant le build.
 
 ### Générer un `JWT_SECRET` sécurisé
-
-Utilise cette commande pour générer une clé aléatoire :
 
 ```bash
 openssl rand -base64 64
 ```
 
-> 📌 Copie-colle la sortie dans ton fichier `.env` :
->
-> ```dotenv
-> JWT_SECRET=vraimentlonguetresaleatoire...
-> ```
-
 ---
 
 ## 🛠️ Spécificités techniques
 
-* `openssl` est installé dans les conteneurs pour la compatibilité Prisma.
-* `npx prisma generate` est exécuté **durant le build Docker**.
-* Le conteneur `api` attend la base via `netcat` avant de démarrer.
-* Les `binaryTargets` sont gérés dynamiquement via `ARG` + `ENV` dans le `Dockerfile`.
-* Swagger est exposé via **Nginx** sur `/api`.
+* `openssl` est installé dans les conteneurs pour Prisma.
+* `npx prisma generate` est exécuté **pendant** le `Dockerfile`.
+* Le conteneur `api` attend la base de données (`netcat`) avant de démarrer.
+* Les `binaryTargets` sont transmis dynamiquement à Prisma via ENV/ARG.
+* Swagger est disponible en production via **Nginx** sur `/api`.
 
 ---
 
@@ -153,3 +151,5 @@ openssl rand -base64 64
 ```bash
 docker compose logs -f api
 ```
+
+Souhaites-tu que je génère aussi un `deploy.sh` ou `Makefile` pour automatiser tout cela ?
