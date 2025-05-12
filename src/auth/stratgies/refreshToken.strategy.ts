@@ -26,11 +26,11 @@ export class RefreshTokenStrategy extends PassportStrategy(
     const authHeader = req.get('Authorization');
     const refreshToken = authHeader?.replace('Bearer', '').trim();
     return {
-      id: payload.sub,
+      user_id: payload.sub,
       mail: payload.mail,
       role: payload.role,
       refreshToken,
     };
   }
-  
+
 }
