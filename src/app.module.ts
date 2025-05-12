@@ -11,9 +11,11 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { TypesModule } from './types/types.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { PositionsModule } from './positions/positions.module';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, TypesModule, StatisticsModule, LoggerModule,
+  imports: [PrismaModule, AuthModule, UsersModule, TypesModule, StatisticsModule, PositionsModule, JobsModule, LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}` 
