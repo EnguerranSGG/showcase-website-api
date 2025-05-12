@@ -21,6 +21,7 @@ import { PartnersModule } from './partners/partners.module';
 import { StructuresModule } from './structures/structures.module';
 import { NewsModule } from './news/news.module';
 import { ValuesModule } from './values/values.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ValuesModule } from './values/values.module';
     StructuresModule,
     NewsModule,
     ValuesModule,
+    FilesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
