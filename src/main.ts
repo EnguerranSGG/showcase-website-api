@@ -6,6 +6,7 @@ import {
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggerService } from './common/logger/logger.service';
+import multipart from '@fastify/multipart'; 
 
 import { PrismaClient } from '@prisma/client';
 
@@ -19,6 +20,9 @@ async function bootstrap() {
   const prisma = new PrismaClient();
   await prisma.$connect();
   await prisma.$disconnect();
+
+  const fastify = app.getHttpAdapter().getInstance();
+  await fastify.register(multipart);
 
   console.log('NODE_ENV =', process.env.NODE_ENV);
 
