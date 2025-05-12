@@ -61,7 +61,7 @@ export class PositionsController {
   }
 
   @Public()
-  @Get(':id/statistics')
+  @Get(':id/jobs')
   @ApiOperation({ summary: 'Récupérer les fonctions associées à une position' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Fonctions récupérées avec succès.' })
