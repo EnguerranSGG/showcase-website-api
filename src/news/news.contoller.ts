@@ -27,7 +27,7 @@ import {
   import { Role } from '@prisma/client';
   
   @ApiTags('News')
-  @Controller('times')
+  @Controller('news')
   export class NewsController {
     constructor(private readonly timesService: NewsService) {}
   
