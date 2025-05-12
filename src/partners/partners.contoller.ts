@@ -87,8 +87,8 @@ import {
     @UseGuards(PublicGuard)
     @Public()
     @Get()
-    @ApiOperation({ summary: 'Récupérer tous les évenements' })
-    @ApiResponse({ status: 200, description: 'Liste des évenements récupérée avec succès.' })
+    @ApiOperation({ summary: 'Récupérer tous les partenaires' })
+    @ApiResponse({ status: 200, description: 'Liste des partenaires récupérée avec succès.' })
     getAll() {
       return this.partnersService.getAll();
     }
