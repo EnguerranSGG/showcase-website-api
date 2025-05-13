@@ -20,7 +20,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   validate(payload: JwtPayload) {
     console.log('JWT payload reçu dans validate :', payload);
     return {
-      id: payload.sub,
+      user_id: payload.sub,
       mail: payload.mail,
       role: payload.role,
     };
