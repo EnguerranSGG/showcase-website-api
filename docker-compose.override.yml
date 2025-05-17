@@ -1,0 +1,22 @@
+services:
+  astro-site:
+    build:
+      context: ../front-air/astro-site
+    container_name: astro-site
+    ports:
+      - "4321:4321"
+    environment:
+      - PUBLIC_API_URL=http://showcase-api:3000
+    depends_on:
+      - api
+
+  admin-dashboard:
+    build:
+      context: ../front-air/admin-dashboard
+    container_name: admin-dashboard
+    ports:
+      - "4200:4200"
+    environment:
+      - API_URL=http://showcase-api:3000
+    depends_on:
+      - api
