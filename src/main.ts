@@ -6,8 +6,9 @@ import {
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggerService } from './common/logger/logger.service';
-import multipart from '@fastify/multipart'; 
+import multipart from '@fastify/multipart';
 import fastifyCors from '@fastify/cors';
+import { ValidationPipe } from '@nestjs/common';
 
 import { PrismaClient } from '@prisma/client';
 
@@ -41,6 +42,14 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   await app.register(fastifyCors, {
     origin: process.env.FRONTEND_ORIGIN || 'http://localhost:4200',
