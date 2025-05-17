@@ -34,13 +34,14 @@ import {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.USER)
     @ApiBearerAuth()
-    @Post()
+    @Post('add')
     @ApiOperation({ summary: 'Créer un événement' })
     @ApiResponse({ status: 201, description: 'Événement créé avec succès.' })
     create(
       @Body() dto: CreateTimeDto,
       @Req() req: any,
     ) {
+      console.log('Payload JWT reçu dans TimesController:', req.user)
       return this.timesService.create(dto, req.user.user_id);
     }
   
@@ -86,7 +87,7 @@ import {
   
     @UseGuards(PublicGuard)
     @Public()
-    @Get()
+    @Get('all')
     @ApiOperation({ summary: 'Récupérer tous les évenements' })
     @ApiResponse({ status: 200, description: 'Liste des évenements récupérée avec succès.' })
     getAll() {
