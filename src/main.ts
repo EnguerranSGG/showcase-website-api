@@ -7,6 +7,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggerService } from './common/logger/logger.service';
 import multipart from '@fastify/multipart'; 
+import fastifyCors from '@fastify/cors';
 
 import { PrismaClient } from '@prisma/client';
 
@@ -39,7 +40,15 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
+
+  await app.register(fastifyCors, {
+    origin: process.env.FRONTEND_ORIGIN || 'http://localhost:4200',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  });
+
+  app.setGlobalPrefix('api');
 
   loggerService.log('🚀 Application is starting...');
 
