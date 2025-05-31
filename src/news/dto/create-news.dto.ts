@@ -18,7 +18,7 @@ export class CreateNewsDto {
   @IsOptional()
   @IsUrl()
   @MaxLength(255)
-  @Transform(({ value }) => sanitize(value))
+  @Transform(({ value }) => value ? sanitize(value) : value)
   link?: string;
 
   @ApiProperty({ example: 'Description détaillée de la nouvelle importante.' })

@@ -22,7 +22,7 @@ export class CreateJobOfferDto {
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  @Transform(({ value }) => sanitize(value))
+  @Transform(({ value }) => value ? sanitize(value) : value)
   city?: string;
 
   @ApiProperty({ example: 'https://imgur.com/logo.jpg', required: false })
@@ -30,7 +30,7 @@ export class CreateJobOfferDto {
   @IsOptional()
   @MaxLength(255)
   @IsUrl()
-  @Transform(({ value }) => sanitize(value))
+  @Transform(({ value }) => value ? sanitize(value) : value)
   link?: string;
 
   @IsOptional()

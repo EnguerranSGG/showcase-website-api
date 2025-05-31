@@ -23,7 +23,7 @@ export class CreateStructureDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  @Transform(({ value }) => (value ? sanitize(value) : undefined))
+  @Transform(({ value }) => value ? sanitize(value) : value)
   address?: string;
 
   @IsOptional()
@@ -34,7 +34,7 @@ export class CreateStructureDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  @Transform(({ value }) => (value ? sanitize(value) : undefined))
+  @Transform(({ value }) => value ? sanitize(value) : value)
   link?: string;
 
   @IsOptional()
