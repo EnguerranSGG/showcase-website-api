@@ -11,7 +11,7 @@ export class PartnersService {
     return this.prisma.partner.create({
       data: {
         name: dto.name,
-        image_url: dto.image_url,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : undefined,
         user: { connect: { user_id: userUuid } },
         created_at: new Date(),
         updated_at: new Date(),
@@ -32,7 +32,7 @@ export class PartnersService {
       where: { parteners_id: id },
       data: {
         name: dto.name,
-        image_url: dto.image_url,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
         user: { connect: { user_id: userUuid } },
         updated_at: new Date(),
       },
@@ -52,6 +52,8 @@ export class PartnersService {
   }
 
   async getAll() {
-    return this.prisma.partner.findMany();
+    return this.prisma.partner.findMany({
+      include: { file: true },
+    });
   }
 }
