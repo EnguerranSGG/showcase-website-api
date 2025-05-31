@@ -34,7 +34,7 @@ import {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.USER)
     @ApiBearerAuth()
-    @Post()
+    @Post('add')
     @ApiOperation({ summary: 'Créer une nouvelle étape' })
     @ApiResponse({ status: 201, description: 'Étape créée avec succès.' })
     create(
@@ -86,7 +86,7 @@ import {
   
     @UseGuards(PublicGuard)
     @Public()
-    @Get('by-paths/:pathId')
+    @Get('by-path/:pathId')
     @ApiOperation({ summary: 'Récupérer les étapes par parcours' })
     @ApiParam({ name: 'pathId', type: Number })
     @ApiResponse({ status: 200, description: 'Étapes récupérées avec succès.' })
@@ -97,7 +97,7 @@ import {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.USER)
     @ApiBearerAuth()
-    @Get()
+    @Get('all')
     @ApiOperation({ summary: 'Récupérer toutes les étapes' })
     @ApiResponse({ status: 200, description: 'Liste des étapes récupérée avec succès.' })
     getAll() {

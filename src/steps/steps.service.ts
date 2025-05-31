@@ -12,7 +12,7 @@ export class StepsService {
       data: {
         name: dto.name,
         description: dto.description,
-        image_url: dto.image_url ?? null,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : undefined,
         path: { connect: { path_id: dto.path_id } },
         user: { connect: { user_id: userUuid } },
         created_at: new Date(),
@@ -35,7 +35,7 @@ export class StepsService {
       data: {
         name: dto.name,
         description: dto.description,
-        image_url: dto.image_url ?? null,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
         path: { connect: { path_id: dto.path_id } },
         user: { connect: { user_id: userUuid } },
         updated_at: new Date(),
@@ -56,7 +56,9 @@ export class StepsService {
   }
 
   async getAll() {
-    return this.prisma.step.findMany();
+    return this.prisma.step.findMany({
+      include: { file: true },
+    });
   }
 
   async getStepsByPathId(pathId: number) {

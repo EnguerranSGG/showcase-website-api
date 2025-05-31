@@ -1,20 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, IsInt } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsInt, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { sanitize } from 'class-sanitizer';
 
 export class CreateStepDto {
   @ApiProperty({ example: 'Découverte du logement' })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
+  @Transform(({ value }) => sanitize(value))
   name: string;
 
-  @ApiProperty({ example: 'https://example.com/image.jpg', required: false })
-  @IsString()
   @IsOptional()
-  image_url?: string;
+  file_id?: number;
 
   @ApiProperty({ example: 'Cette étape permet de comprendre les critères de sélection.' })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(390)
+  @Transform(({ value }) => sanitize(value))
   description: string;
 
   @ApiProperty({ example: 1 })
