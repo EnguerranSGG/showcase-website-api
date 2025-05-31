@@ -34,7 +34,7 @@ import {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.USER)
     @ApiBearerAuth()
-    @Post()
+    @Post('add')
     @ApiOperation({ summary: 'Créer une offre de poste' })
     @ApiResponse({ status: 201, description: 'Offre de poste créée avec succès.' })
     create(
@@ -86,7 +86,7 @@ import {
   
     @UseGuards(PublicGuard)
     @Public()
-    @Get()
+    @Get('all')
     @ApiOperation({ summary: 'Récupérer toutes les offre de postes' })
     @ApiResponse({ status: 200, description: 'Liste des offre de postes récupérée avec succès.' })
     getAll() {

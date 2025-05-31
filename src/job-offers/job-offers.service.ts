@@ -13,9 +13,9 @@ export class JobOffersService {
         name: dto.name,
         job_type: dto.job_type,
         city: dto.city ?? null,
-        image_url: dto.image_url ?? null,
         link: dto.link ?? null,
         description: dto.description,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : undefined,
         user: { connect: { user_id: userUuid } },
         created_at: new Date(),
         updated_at: new Date(),
@@ -38,9 +38,9 @@ export class JobOffersService {
         name: dto.name,
         job_type: dto.job_type,
         city: dto.city ?? null,
-        image_url: dto.image_url ?? null,
         link: dto.link ?? null,
         description: dto.description,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
         user: { connect: { user_id: userUuid } },
         updated_at: new Date(),
       },
@@ -56,10 +56,13 @@ export class JobOffersService {
   async getById(id: number) {
     return this.prisma.job_offer.findUnique({
       where: { job_offer_id: id },
+      include: { file: true },
     });
   }
 
   async getAll() {
-    return this.prisma.job_offer.findMany();
+    return this.prisma.job_offer.findMany({
+      include: { file: true },
+    });
   }
 }
