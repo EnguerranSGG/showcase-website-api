@@ -11,7 +11,7 @@ export class NewsService {
     return this.prisma.news.create({
       data: {
         name: dto.name,
-        image_url: dto.image_url ?? null,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : undefined,
         link: dto.link ?? null,
         description: dto.description,
         user: { connect: { user_id: userUuid } },
@@ -34,7 +34,7 @@ export class NewsService {
       where: { news_id: id },
       data: {
         name: dto.name,
-        image_url: dto.image_url ?? null,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
         link: dto.link ?? null,
         description: dto.description,
         user: { connect: { user_id: userUuid } },
@@ -55,7 +55,17 @@ export class NewsService {
     });
   }
 
+  async getLatest() {
+    return this.prisma.news.findFirst({
+      include: { file: true },
+      orderBy: { created_at: 'desc' },
+    });
+  }
+  
+
   async getAll() {
-    return this.prisma.news.findMany();
+    return this.prisma.news.findMany({
+      include: { file: true },
+    });
   }
 }
