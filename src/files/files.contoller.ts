@@ -25,8 +25,11 @@ import { PublicGuard } from 'src/auth/guards/public.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { NotFoundException } from '@nestjs/common';
+import { FastifyReply } from 'fastify';
+import { Res } from '@nestjs/common';
 
-@ApiTags('Files')
+import { lookup } from 'mime-types';
+
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
@@ -74,16 +77,43 @@ export class FilesController {
     );
   }
 
+  @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
-  @Put(':id')
-  @ApiOperation({ summary: 'Mettre à jour un fichier (nom uniquement)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Mettre à jour un fichier (contenu uniquement)' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: 'Fichier mis à jour avec succès.' })
   @ApiResponse({ status: 404, description: 'Fichier non trouvé.' })
-  update(@Param('id') id: number, @Req() req: any) {
-    return this.filesService.update(Number(id), req.user.user_id);
+  async update(@Param('id') id: number, @Req() req: any) {
+    const parts = req.parts();
+    let fileBuffer: Buffer | null = null;
+    console.log('req.isMultipart:', req.isMultipart());
+
+    for await (const part of parts) {
+      if (part.type === 'file') {
+        fileBuffer = await part.toBuffer();
+      }
+    }
+
+    if (!fileBuffer) {
+      throw new Error('Aucun fichier reçu');
+    }
+
+    return this.filesService.updateFileContent(
+      Number(id),
+      fileBuffer,
+      req.user.user_id,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -112,32 +142,35 @@ export class FilesController {
 
   @UseGuards(PublicGuard)
   @Public()
-  @Get()
+  @Get('all')
   @ApiOperation({ summary: 'Récupérer tous les fichiers' })
-  @ApiResponse({ status: 200, description: 'Liste des fichiers récupérée avec succès.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des fichiers récupérée avec succès.',
+  })
   getAll() {
     return this.filesService.getAll();
   }
 
-  @UseGuards(PublicGuard)
-  @Public()
+  @ApiTags('Files')
   @Get(':id/download')
+  @Public()
   @ApiOperation({ summary: 'Télécharger un fichier' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Fichier téléchargé avec succès.' })
   @ApiResponse({ status: 404, description: 'Fichier non trouvé.' })
-  async downloadFile(@Param('id') id: number, @Req() req: any) {
+  async downloadFile(@Param('id') id: number, @Res() res: FastifyReply) {
     const file = await this.filesService.getById(Number(id));
 
     if (!file) {
       throw new NotFoundException('Fichier non trouvé');
     }
 
-    const fastifyReply = req.res;
-    fastifyReply
-      .header('Content-Disposition', `attachment; filename="${file.name}"`)
-      .header('Content-Type', 'application/octet-stream')
-      .send(Buffer.from(file.file));
-  }
+    const mimeType = lookup(file.name) || 'application/octet-stream';
 
+    res
+      .header('Content-Disposition', `inline; filename="${file.name}"`)
+      .header('Content-Type', mimeType)
+      .send(file.file);
+  }
 }
