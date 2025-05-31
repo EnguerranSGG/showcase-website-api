@@ -1,14 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { sanitize } from 'class-sanitizer';
 
 export class CreateValueDto {
   @ApiProperty({ example: 'Solidarité' })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
+  @Transform(({ value }) => sanitize(value))
   name: string;
 
-  @ApiProperty({ example: 'https://exemple.com/image.png', required: false })
-  @IsString()
   @IsOptional()
-  image_url?: string;
+  file_id?: number;
+
 }

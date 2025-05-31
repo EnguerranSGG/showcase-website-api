@@ -34,7 +34,7 @@ import {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.USER)
     @ApiBearerAuth()
-    @Post()
+    @Post('add')
     @ApiOperation({ summary: 'Créer une valeur' })
     @ApiResponse({ status: 201, description: 'Valeur créée avec succès.' })
     create(
@@ -86,7 +86,7 @@ import {
   
     @UseGuards(PublicGuard)
     @Public()
-    @Get()
+    @Get('all')
     @ApiOperation({ summary: 'Récupérer toutes les valeurs' })
     @ApiResponse({ status: 200, description: 'Liste des valeurs récupérée avec succès.' })
     getAll() {
