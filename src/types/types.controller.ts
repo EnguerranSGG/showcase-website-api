@@ -17,7 +17,7 @@ export class TypesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
-  @Post('addNewType')
+  @Post('add')
   @ApiOperation({ summary: 'Créer un nouveau type' })
   @ApiResponse({ status: 201, description: 'Type créé avec succès.' })
   create(@Body() dto: CreateTypeDto) {
@@ -72,7 +72,7 @@ export class TypesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
-  @Get()
+  @Get('all')
   @ApiOperation({ summary: 'Récupérer tous les types' })
   @ApiResponse({ status: 200, description: 'Liste des types récupérée avec succès.' })
   getAll() {
