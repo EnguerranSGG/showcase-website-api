@@ -1,44 +1,45 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, MaxLength, ValidateNested, IsArray, ArrayNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
+import { sanitize } from 'class-sanitizer';
+import { CreateMissionDto } from '../../missions/dto/create-mission.dto';
+
 
 export class CreateStructureDto {
-  @ApiProperty({ example: 'Maison de quartier' })
   @IsString()
-  @IsNotEmpty()
+  @MaxLength(60)
+  @Transform(({ value }) => sanitize(value))
   name: string;
 
-  @ApiProperty({ example: 'https://example.com/image.png', required: false })
-  @IsString()
   @IsOptional()
-  image_url?: string;
+  @Type(() => Number)
+  file_id?: number;
 
-  @ApiProperty({ example: 'Lieu d’accueil et d’accompagnement pour les familles' })
   @IsString()
-  @IsNotEmpty()
+  @MaxLength(330)
+  @Transform(({ value }) => sanitize(value))
   description: string;
 
-  @ApiProperty({ example: '12 rue des Lilas, 75019 Paris', required: false })
-  @IsString()
   @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  @Transform(({ value }) => (value ? sanitize(value) : undefined))
   address?: string;
 
-  @ApiProperty({ example: '+33 1 23 45 67 89', required: false })
-  @IsString()
   @IsOptional()
+  @IsString()
+  @MaxLength(25)
   phone_number?: string;
 
-  @ApiProperty({ example: 'Accompagnement social, aide alimentaire', required: false })
-  @IsString()
   @IsOptional()
-  missions?: string;
-
-  @ApiProperty({ example: 'https://structure.example.com', required: false })
   @IsString()
-  @IsOptional()
+  @MaxLength(255)
+  @Transform(({ value }) => (value ? sanitize(value) : undefined))
   link?: string;
 
-  @ApiProperty({ example: 'Lundi au vendredi : 9h-17h', required: false })
-  @IsString()
   @IsOptional()
-  schedule?: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateMissionDto)
+  missions?: CreateMissionDto[];
 }

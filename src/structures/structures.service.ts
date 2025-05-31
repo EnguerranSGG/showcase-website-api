@@ -7,63 +7,98 @@ import { UpdateStructureDto } from './dto/update-structure.dto';
 export class StructuresService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateStructureDto, userUuid: string) {
-    return this.prisma.structure.create({
+  async create(dto: CreateStructureDto, user_id: string) {
+    console.log('StructureService | DTO après validation :', dto)
+    const structure = await this.prisma.structure.create({
       data: {
         name: dto.name,
-        image_url: dto.image_url ?? null,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : undefined,
         description: dto.description,
         address: dto.address ?? null,
         phone_number: dto.phone_number ?? null,
-        missions: dto.missions ?? null,
-        link: dto.link ?? null,
-        schedule: dto.schedule ?? null,
-        user: { connect: { user_id: userUuid } },
-        created_at: new Date(),
+        created_at: new Date(),      
         updated_at: new Date(),
+        link: dto.link ?? null,
+        user: {
+          connect: { user_id },
+        },
       },
     });
-  }
-
-  async update(id: number, dto: UpdateStructureDto, userUuid: string) {
-    const existing = await this.prisma.structure.findUnique({
-      where: { structure_id: id },
-    });
-
-    if (!existing) {
-      throw new NotFoundException('Structure not found');
+  
+    // Créer les missions si présentes
+    if (dto.missions!.length > 0) {
+      await this.prisma.mission.createMany({
+        data: dto.missions!.map(mission => ({
+          content: mission.content,
+          structure_id: structure.structure_id,
+          user_id,
+        })),
+      });
     }
+  
+    return structure;
+  }
+  
+  
 
-    return this.prisma.structure.update({
+  async update(id: number, dto: UpdateStructureDto, user_id: string) {
+    // On met à jour les données de base de la structure
+    const updated = await this.prisma.structure.update({
       where: { structure_id: id },
       data: {
         name: dto.name,
-        image_url: dto.image_url ?? null,
+        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
         description: dto.description,
-        address: dto.address ?? null,
-        phone_number: dto.phone_number ?? null,
-        missions: dto.missions ?? null,
-        link: dto.link ?? null,
-        schedule: dto.schedule ?? null,
-        user: { connect: { user_id: userUuid } },
+        address: dto.address,
+        phone_number: dto.phone_number,
+        link: dto.link,
         updated_at: new Date(),
       },
     });
-  }
-
-  async delete(id: number) {
-    return this.prisma.structure.delete({
+  
+    // 🔁 Supprimer les missions existantes (liées à cette structure)
+    await this.prisma.mission.deleteMany({
       where: { structure_id: id },
     });
+  
+    // ➕ Ajouter les nouvelles missions s'il y en a
+    if (dto.missions!.length > 0) {
+      await this.prisma.mission.createMany({
+        data: dto.missions!.map(mission => ({
+          content: mission.content,
+          structure_id: id,
+          user_id,
+        })),
+      });
+    }
+  
+    return updated;
   }
+
+  async delete(structure_id: number) {
+    await this.prisma.mission.deleteMany({
+      where: { structure_id },
+    });
+  
+    return this.prisma.structure.delete({
+      where: { structure_id },
+    });
+  }
+  
 
   async getById(id: number) {
-    return this.prisma.structure.findUnique({
-      where: { structure_id: id },
+    const structure = await this.prisma.structure.findUnique({ where: { structure_id: id } });
+    if (!structure) throw new NotFoundException('Structure non trouvée');
+    return structure;
+  }
+
+  getAll() {
+    return this.prisma.structure.findMany({
+      include: {
+        missions: true,
+        file: true,
+      }
     });
   }
 
-  async getAll() {
-    return this.prisma.structure.findMany();
-  }
 }
