@@ -12,6 +12,7 @@ export class StatisticsService {
         label: dto.label,
         value: dto.value,
         year: dto.year,
+        is_percentage: dto.is_percentage,
         type: { connect: { type_id: dto.type_id } },
         user: { connect: { user_id: userUuid } },
       });
@@ -20,6 +21,7 @@ export class StatisticsService {
         label: dto.label,
         value: dto.value,
         year: dto.year,
+        is_percentage: dto.is_percentage,
         type: { connect: { type_id: dto.type_id } },
         user: { connect: { user_id: userUuid } },
         created_at: new Date(),
@@ -42,6 +44,7 @@ export class StatisticsService {
       data: {
         label: dto.label,
         value: dto.value,
+        is_percentage: dto.is_percentage,
         year: dto.year,
         type: { connect: { type_id: dto.type_id } },
         user: { connect: { user_id: userUuid } },
@@ -61,6 +64,19 @@ export class StatisticsService {
       where: { statistic_id: id },
     });
   }
+
+  async getByTypeName(typeName: string) {
+    return this.prisma.statistic.findMany({
+      where: {
+        type: {
+          name: typeName,
+        },
+      },
+      orderBy: {
+        year: 'desc',
+      },
+    });
+  }  
 
   async getAll() {
     return this.prisma.statistic.findMany();
