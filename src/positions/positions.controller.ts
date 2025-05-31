@@ -17,7 +17,7 @@ export class PositionsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
-  @Post('addNewPosition')
+  @Post('add')
   @ApiOperation({ summary: 'Créer une nouvelle position' })
   @ApiResponse({ status: 201, description: 'Position crée avec succès.' })
   create(@Body() dto: CreatePositionDto) {
@@ -72,7 +72,7 @@ export class PositionsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
-  @Get()
+  @Get('all')
   @ApiOperation({ summary: 'Récupérer toutes les positions' })
   @ApiResponse({ status: 200, description: 'Liste des positions récupérée avec succès.' })
   getAll() {
