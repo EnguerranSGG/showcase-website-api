@@ -26,8 +26,11 @@ import {
       const request = context.switchToHttp().getRequest();
       const user = request.user;
 
-      console.log('Utilisateur courant:', user);
-      console.log('Rôle attendu:', requiredRoles);
+      // Logs conditionnels seulement en mode debug
+      if (process.env.NODE_ENV === 'development' && process.env.DEBUG_AUTH === 'true') {
+        console.log('Utilisateur courant:', user);
+        console.log('Rôle attendu:', requiredRoles);
+      }
 
       if (!user || !requiredRoles.includes(user.role)) {
         throw new ForbiddenException('Accès refusé');
