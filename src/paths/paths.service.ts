@@ -18,7 +18,9 @@ export class PathsService {
   }
 
   async update(id: number, dto: UpdatePathDto) {
-    const pathExists = await this.prisma.path.findUnique({ where: { path_id: id } });
+    const pathExists = await this.prisma.path.findUnique({
+      where: { path_id: id },
+    });
     if (!pathExists) {
       throw new NotFoundException(`Path avec l'ID ${id} non trouvé.`);
     }
@@ -32,7 +34,9 @@ export class PathsService {
   }
 
   async delete(id: number) {
-    const pathExists = await this.prisma.path.findUnique({ where: { path_id: id } });
+    const pathExists = await this.prisma.path.findUnique({
+      where: { path_id: id },
+    });
     if (!pathExists) {
       throw new NotFoundException(`Path avec l'ID ${id} non trouvé.`);
     }
@@ -56,6 +60,12 @@ export class PathsService {
       throw new NotFoundException(`Path avec l'ID ${id} non trouvé.`);
     }
     return path.steps;
+  }
+
+  async findByName(name: string) {
+    return this.prisma.path.findUnique({
+      where: { name },
+    });
   }
 
   async getAll() {

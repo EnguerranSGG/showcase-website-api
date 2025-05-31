@@ -1,8 +1,23 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { PathsService } from './paths.service';
 import { CreatePathDto } from './dto/create-path.dto';
 import { UpdatePathDto } from './dto/update-path.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -69,14 +84,23 @@ export class PathsController {
     return this.pathsService.getStepsPathById(Number(id));
   }
 
+  @Public()
+  @Get('by-name/:name')
+  @ApiResponse({ status: 200, description: 'Étapes récupérées avec succès.' })
+  async getByName(@Param('name') name: string) {
+    return this.pathsService.findByName(name);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les parcours' })
-  @ApiResponse({ status: 200, description: 'Liste des parcours récupérée avec succès.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des parcours récupérée avec succès.',
+  })
   getAll() {
     return this.pathsService.getAll();
   }
 }
-
