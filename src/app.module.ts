@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { LoggerModule } from './common/logger/logger.module';
-import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { TypesModule } from './types/types.module';
@@ -22,6 +22,8 @@ import { StructuresModule } from './structures/structures.module';
 import { NewsModule } from './news/news.module';
 import { ValuesModule } from './values/values.module';
 import { FilesModule } from './files/files.module';
+import { MissionsModule } from './missions/missions.modules';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { FilesModule } from './files/files.module';
     TimesModule,
     PartnersModule,
     StructuresModule,
+    MissionsModule,
     NewsModule,
     ValuesModule,
     FilesModule,
@@ -57,6 +60,10 @@ import { FilesModule } from './files/files.module';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
     },
   ],
 })

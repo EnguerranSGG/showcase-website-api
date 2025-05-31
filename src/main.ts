@@ -1,3 +1,4 @@
+import 'reflect-metadata';            
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -9,8 +10,9 @@ import { LoggerService } from './common/logger/logger.service';
 import multipart from '@fastify/multipart';
 import fastifyCors from '@fastify/cors';
 import { ValidationPipe } from '@nestjs/common';
-
 import { PrismaClient } from '@prisma/client';
+
+import { SanitizeInterceptor } from './common/interceptors/sanitize.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -18,15 +20,35 @@ async function bootstrap() {
     new FastifyAdapter(),
     { logger: false },
   );
+  app.useGlobalInterceptors(new SanitizeInterceptor());
 
   const prisma = new PrismaClient();
-  await prisma.$connect();
-  await prisma.$disconnect();
+  try {
+    await prisma.$connect();
+    console.log('✅ Connexion à la base de données réussie');
+    await prisma.$disconnect();
+  } catch (error) {
+    console.error('❌ Erreur de connexion à la base de données:', error);
+    process.exit(1);
+  }
 
   const fastify = app.getHttpAdapter().getInstance();
-  await fastify.register(multipart);
+  await fastify.register(multipart, {
+    limits: {
+      fileSize: 10 * 1024 * 1024,
+    },
+  });
 
-  console.log('NODE_ENV =', process.env.NODE_ENV);
+  if (process.env.NODE_ENV === 'development' && process.env.DEBUG_REQUESTS === 'true') {
+    fastify.addHook('preValidation', (request, reply, done) => {
+      if (request.body && Object.keys(request.body).length > 0) {
+        console.log('--- RAW BODY ---');
+        console.log(JSON.stringify(request.body, null, 2));
+        console.log('----------------');
+      }
+      done();
+    });
+  }
 
   const loggerService = app.get(LoggerService);
   app.useLogger(loggerService);
@@ -46,13 +68,13 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true,
+      forbidNonWhitelisted: false,
       transform: true,
     }),
   );
 
   await app.register(fastifyCors, {
-    origin: process.env.FRONTEND_ORIGIN || 'http://localhost:4200',
+    origin: process.env.FRONTEND_ORIGIN || 'http://localhost:4200' || 'http://localhost:4321',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   });
@@ -64,4 +86,7 @@ async function bootstrap() {
   await app.listen(3000, '0.0.0.0');
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('❌ Erreur lors du démarrage de l\'application:', error);
+  process.exit(1);
+});
