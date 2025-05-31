@@ -11,8 +11,6 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { TypesModule } from './types/types.module';
 import { StatisticsModule } from './statistics/statistics.module';
-import { PositionsModule } from './positions/positions.module';
-import { JobsModule } from './jobs/jobs.module';
 import { PathsModule } from './paths/paths.module';
 import { StepsModule } from './steps/steps.module';
 import { JobOffersModule } from './job-offers/job-offers.module';
@@ -32,8 +30,6 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
     UsersModule,
     TypesModule,
     StatisticsModule,
-    PositionsModule,
-    JobsModule,
     PathsModule,
     StepsModule,
     LoggerModule,
