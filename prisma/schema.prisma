@@ -36,7 +36,6 @@ model User {
   statistics   Statistic[]
   news         News[]
   values       Value[]
-  jobs         Job[]
   steps        Step[]
   files        File[]
   missions     Mission[]
@@ -155,29 +154,6 @@ model Value {
   user       User     @relation(fields: [user_id], references: [user_id])
 
   @@map("values")
-}
-
-model Position {
-  position_id Int      @id @default(autoincrement())
-  name        String
-  created_at  DateTime
-  updated_at  DateTime
-  jobs        Job[]
-
-  @@map("positions")
-}
-
-model Job {
-  job_id      Int      @id @default(autoincrement())
-  function    String
-  created_at  DateTime
-  updated_at  DateTime
-  position_id Int
-  user_id     String
-  position    Position @relation(fields: [position_id], references: [position_id])
-  user        User     @relation(fields: [user_id], references: [user_id])
-
-  @@map("jobs")
 }
 
 model Step {
