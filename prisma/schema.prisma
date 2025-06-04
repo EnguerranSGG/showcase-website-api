@@ -185,6 +185,7 @@ model Path {
 model File {
   file_id    Int         @id @default(autoincrement())
   name       String
+  title      String?
   file       Bytes
   created_at DateTime
   updated_at DateTime
