@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, IsInt, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsInt,
+  MaxLength,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { sanitize } from 'class-sanitizer';
 
@@ -14,7 +20,9 @@ export class CreateStepDto {
   @IsOptional()
   file_id?: number;
 
-  @ApiProperty({ example: 'Cette étape permet de comprendre les critères de sélection.' })
+  @ApiProperty({
+    example: 'Cette étape permet de comprendre les critères de sélection.',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(390)
