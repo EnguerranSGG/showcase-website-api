@@ -44,6 +44,7 @@ export class FilesController {
       type: 'object',
       properties: {
         name: { type: 'string' },
+        title: { type: 'string' },
         file: { type: 'string', format: 'binary' },
       },
     },
@@ -53,6 +54,7 @@ export class FilesController {
   async uploadFile(@Req() req: any) {
     const parts = req.parts();
     let name = '';
+    let title: string | undefined;
     let fileBuffer: Buffer | null = null;
 
     for await (const part of parts) {
@@ -61,6 +63,8 @@ export class FilesController {
         name = part.filename || 'unknown';
       } else if (part.type === 'field' && part.fieldname === 'name') {
         name = part.value;
+      } else if (part.type === 'field' && part.fieldname === 'title') {
+        title = part.value;
       }
     }
 
@@ -71,6 +75,7 @@ export class FilesController {
     return this.filesService.create(
       {
         name,
+        title,
         file: fileBuffer,
       },
       req.user.user_id,
@@ -116,6 +121,40 @@ export class FilesController {
     );
   }
 
+  @Put(':id/metadata')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.USER)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: "Mettre à jour le titre d'un fichier" })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Titre mis à jour avec succès.' })
+  @ApiResponse({ status: 404, description: 'Fichier non trouvé.' })
+  async updateMetadata(@Param('id') id: number, @Req() req: any) {
+    const parts = req.parts();
+    let title: string | undefined;
+
+    for await (const part of parts) {
+      if (part.type === 'field' && part.fieldname === 'title') {
+        title = part.value;
+      }
+    }
+
+    return this.filesService.updateFileTitle(
+      Number(id),
+      title,
+      req.user.user_id,
+    );
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -150,6 +189,31 @@ export class FilesController {
   })
   getAll() {
     return this.filesService.getAll();
+  }
+
+  @UseGuards(PublicGuard)
+  @Public()
+  @Get(':id/title')
+  @ApiOperation({ summary: 'Récupérer le titre d\'un fichier par ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Titre du fichier récupéré avec succès.',
+    content: {
+      'text/plain': {
+        schema: {
+          type: 'string',
+          example: 'Mon document important'
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 404, description: 'Fichier non trouvé.' })
+  async getTitleById(@Param('id') id: number, @Res() res: FastifyReply) {
+    const result = await this.filesService.getTitleById(Number(id));
+    res
+      .header('Content-Type', 'text/plain; charset=utf-8')
+      .send(result.title || '');
   }
 
   @ApiTags('Files')
