@@ -27,6 +27,7 @@ import { Role } from '@prisma/client';
 import { NotFoundException } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { Res } from '@nestjs/common';
+import { UploadThrottle } from '../auth/decorators/throttle.decorator';
 
 import { lookup } from 'mime-types';
 
@@ -34,6 +35,7 @@ import { lookup } from 'mime-types';
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
+  @UploadThrottle()
   @Post('upload')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
@@ -82,6 +84,7 @@ export class FilesController {
     );
   }
 
+  @UploadThrottle()
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
