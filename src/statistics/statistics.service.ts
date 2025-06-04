@@ -9,13 +9,13 @@ export class StatisticsService {
 
   async create(dto: CreateStatisticDto, userUuid: string) {
     console.log({
-        label: dto.label,
-        value: dto.value,
-        year: dto.year,
-        is_percentage: dto.is_percentage,
-        type: { connect: { type_id: dto.type_id } },
-        user: { connect: { user_id: userUuid } },
-      });
+      label: dto.label,
+      value: dto.value,
+      year: dto.year,
+      is_percentage: dto.is_percentage,
+      type: { connect: { type_id: dto.type_id } },
+      user: { connect: { user_id: userUuid } },
+    });
     return this.prisma.statistic.create({
       data: {
         label: dto.label,
@@ -76,7 +76,7 @@ export class StatisticsService {
         year: 'desc',
       },
     });
-  }  
+  }
 
   async getAll() {
     return this.prisma.statistic.findMany();
