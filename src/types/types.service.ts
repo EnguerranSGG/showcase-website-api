@@ -18,7 +18,9 @@ export class TypesService {
   }
 
   async update(id: number, dto: UpdateTypeDto) {
-    const typeExists = await this.prisma.type.findUnique({ where: { type_id: id } });
+    const typeExists = await this.prisma.type.findUnique({
+      where: { type_id: id },
+    });
     if (!typeExists) {
       throw new NotFoundException(`Type avec l'ID ${id} non trouvé.`);
     }
@@ -32,7 +34,9 @@ export class TypesService {
   }
 
   async delete(id: number) {
-    const typeExists = await this.prisma.type.findUnique({ where: { type_id: id } });
+    const typeExists = await this.prisma.type.findUnique({
+      where: { type_id: id },
+    });
     if (!typeExists) {
       throw new NotFoundException(`Type avec l'ID ${id} non trouvé.`);
     }

@@ -1,8 +1,23 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { TypesService } from './types.service';
 import { CreateTypeDto } from './dto/create-type.dto';
 import { UpdateTypeDto } from './dto/update-type.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -64,7 +79,10 @@ export class TypesController {
   @Get(':id/statistics')
   @ApiOperation({ summary: 'Récupérer les statistiques associées à un type' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Statistiques récupérées avec succès.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistiques récupérées avec succès.',
+  })
   getStatisticsById(@Param('id') id: number) {
     return this.typesService.getStatisticsById(Number(id));
   }
@@ -74,9 +92,11 @@ export class TypesController {
   @ApiBearerAuth()
   @Get('all')
   @ApiOperation({ summary: 'Récupérer tous les types' })
-  @ApiResponse({ status: 200, description: 'Liste des types récupérée avec succès.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des types récupérée avec succès.',
+  })
   getAll() {
     return this.typesService.getAll();
   }
 }
-
