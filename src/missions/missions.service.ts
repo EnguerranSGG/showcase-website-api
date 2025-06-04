@@ -29,7 +29,9 @@ export class MissionsService {
   }
 
   async update(id: number, dto: UpdateMissionDto) {
-    const mission = await this.prisma.mission.findUnique({ where: { mission_id: id } });
+    const mission = await this.prisma.mission.findUnique({
+      where: { mission_id: id },
+    });
     if (!mission) {
       throw new NotFoundException(`Mission avec l’ID ${id} non trouvée.`);
     }
@@ -43,7 +45,9 @@ export class MissionsService {
   }
 
   async delete(id: number) {
-    const mission = await this.prisma.mission.findUnique({ where: { mission_id: id } });
+    const mission = await this.prisma.mission.findUnique({
+      where: { mission_id: id },
+    });
     if (!mission) {
       throw new NotFoundException(`Mission avec l’ID ${id} non trouvée.`);
     }
