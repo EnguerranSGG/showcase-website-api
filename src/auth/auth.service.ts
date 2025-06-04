@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -13,11 +17,10 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private logger: LoggerService
-    ) {}
+    private logger: LoggerService,
+  ) {}
 
   async addUser(dto: RegisterDto) {
-
     this.logger.log(`Tentative d'inscription pour l'email : ${dto.mail}`);
 
     const userExists = await this.prisma.user.findUnique({
@@ -52,38 +55,40 @@ export class AuthService {
       user: {
         id: user.user_id,
         mail: user.mail,
-        tokens
+        tokens,
       },
     };
   }
   async login(dto: LoginDto) {
     this.logger.log(`Tentative de connexion pour : ${dto.mail}`, 'AuthService');
-  
+
     const user = await this.prisma.user.findUnique({
       where: { mail: dto.mail },
     });
-  
+
     this.logger.debug(`Mail reçu : ${dto.mail}`, 'AuthService');
-  
+
     if (!user) {
       throw new UnauthorizedException('Identifiants invalides');
     }
-    
+
     const passwordValid = await bcrypt.compare(dto.password, user.password);
-    
+
     if (!passwordValid) {
-      this.logger.warn(`Mot de passe invalide pour : ${dto.mail}`, 'AuthService');
+      this.logger.warn(
+        `Mot de passe invalide pour : ${dto.mail}`,
+        'AuthService',
+      );
       throw new UnauthorizedException('Identifiants invalides');
     }
-  
+
     this.logger.log(`Connexion réussie pour : ${dto.mail}`, 'AuthService');
-  
+
     const tokens = await this.getTokens(user.user_id, user.mail, user.role);
     await this.refreshToken(user.user_id, tokens.refreshToken);
-  
+
     return tokens;
   }
-  
 
   async logout(userId: string) {
     await this.prisma.user.update({
@@ -92,7 +97,7 @@ export class AuthService {
     });
 
     this.logger.log(`Déconnexion réussie !`);
-  }  
+  }
 
   async refreshToken(userId: string, refreshToken: string) {
     const hashed = await bcrypt.hash(refreshToken, 10);
@@ -100,13 +105,15 @@ export class AuthService {
       where: { user_id: userId },
       data: { refreshToken: hashed },
     });
-  } 
+  }
 
   async getTokens(userId: string, mail: string, role: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: userId, mail, role
+          sub: userId,
+          mail,
+          role,
         },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
@@ -130,5 +137,4 @@ export class AuthService {
       refreshToken,
     };
   }
-
 }

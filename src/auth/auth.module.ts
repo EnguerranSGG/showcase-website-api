@@ -5,7 +5,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { PrismaService } from '../prisma/prisma.service';
-import { JwtConfig } from './jwt.config'; 
+import { JwtConfig } from './jwt.config';
 import { AccessTokenStrategy } from './stratgies/accessToken.strategy';
 import { RefreshTokenStrategy } from './stratgies/refreshToken.strategy';
 import { LoggerService } from 'src/common/logger/logger.service';
@@ -25,8 +25,15 @@ import { RolesGuard } from './guards/roles.guard';
       }),
     }),
   ],
-  providers: [AuthService, PrismaService, JwtConfig, 
-    AccessTokenStrategy, RefreshTokenStrategy, RolesGuard, LoggerService],
+  providers: [
+    AuthService,
+    PrismaService,
+    JwtConfig,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+    RolesGuard,
+    LoggerService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}
