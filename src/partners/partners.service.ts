@@ -32,7 +32,9 @@ export class PartnersService {
       where: { parteners_id: id },
       data: {
         name: dto.name,
-        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
+        file: dto.file_id
+          ? { connect: { file_id: dto.file_id } }
+          : { disconnect: true },
         user: { connect: { user_id: userUuid } },
         updated_at: new Date(),
       },
