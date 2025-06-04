@@ -13,5 +13,4 @@ export class CreateValueDto {
 
   @IsOptional()
   file_id?: number;
-
 }
