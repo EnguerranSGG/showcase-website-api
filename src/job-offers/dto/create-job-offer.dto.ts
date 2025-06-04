@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, MaxLength, IsUrl } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  IsUrl,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { sanitize } from 'class-sanitizer';
 
@@ -22,7 +28,7 @@ export class CreateJobOfferDto {
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  @Transform(({ value }) => value ? sanitize(value) : value)
+  @Transform(({ value }) => (value ? sanitize(value) : value))
   city?: string;
 
   @ApiProperty({ example: 'https://imgur.com/logo.jpg', required: false })
@@ -30,7 +36,7 @@ export class CreateJobOfferDto {
   @IsOptional()
   @MaxLength(255)
   @IsUrl()
-  @Transform(({ value }) => value ? sanitize(value) : value)
+  @Transform(({ value }) => (value ? sanitize(value) : value))
   link?: string;
 
   @IsOptional()
@@ -44,4 +50,3 @@ export class CreateJobOfferDto {
   @Transform(({ value }) => sanitize(value))
   description: string;
 }
-

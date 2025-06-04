@@ -40,7 +40,9 @@ export class JobOffersService {
         city: dto.city ?? null,
         link: dto.link ?? null,
         description: dto.description,
-        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
+        file: dto.file_id
+          ? { connect: { file_id: dto.file_id } }
+          : { disconnect: true },
         user: { connect: { user_id: userUuid } },
         updated_at: new Date(),
       },
