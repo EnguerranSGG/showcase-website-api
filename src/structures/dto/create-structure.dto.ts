@@ -1,9 +1,15 @@
-import { IsOptional, IsString, MaxLength, ValidateNested, IsArray, ArrayNotEmpty } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateNested,
+  IsArray,
+  ArrayNotEmpty,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { Transform } from 'class-transformer';
 import { sanitize } from 'class-sanitizer';
 import { CreateMissionDto } from '../../missions/dto/create-mission.dto';
-
 
 export class CreateStructureDto {
   @IsString()
@@ -23,7 +29,7 @@ export class CreateStructureDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  @Transform(({ value }) => value ? sanitize(value) : value)
+  @Transform(({ value }) => (value ? sanitize(value) : value))
   address?: string;
 
   @IsOptional()
@@ -34,7 +40,7 @@ export class CreateStructureDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  @Transform(({ value }) => value ? sanitize(value) : value)
+  @Transform(({ value }) => (value ? sanitize(value) : value))
   link?: string;
 
   @IsOptional()

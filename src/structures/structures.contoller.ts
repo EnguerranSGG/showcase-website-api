@@ -30,7 +30,6 @@ import { Logger } from '@nestjs/common';
 @ApiTags('Structures')
 @Controller('structures')
 export class StructuresController {
-
   private readonly logger = new Logger(StructuresController.name);
 
   constructor(private readonly structuresService: StructuresService) {}
@@ -45,9 +44,12 @@ export class StructuresController {
     this.logger.log('Requête POST reçue pour /api/structures/add');
     this.logger.log('DTO reçu :', dto);
     this.logger.log('User ID reçu :', req.user?.user_id);
-    console.log('missions côté serveur :',
-            dto.missions,
-            'Array ?', Array.isArray(dto.missions));
+    console.log(
+      'missions côté serveur :',
+      dto.missions,
+      'Array ?',
+      Array.isArray(dto.missions),
+    );
     return this.structuresService.create(dto, req.user.user_id);
   }
 
