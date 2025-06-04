@@ -18,5 +18,4 @@ export class RegisterDto {
   @IsNotEmpty()
   @ApiProperty({ example: 'Doe' })
   lastname: string;
-
 }
