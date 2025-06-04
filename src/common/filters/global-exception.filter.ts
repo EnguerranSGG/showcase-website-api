@@ -24,7 +24,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const errorResponse = exception.getResponse();
-      
+
       if (typeof errorResponse === 'string') {
         message = errorResponse;
       } else if (typeof errorResponse === 'object' && errorResponse !== null) {
@@ -34,19 +34,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof Error) {
       message = exception.message;
       error = exception.name;
-      
+
       // Log l'erreur détaillée pour le debug
       this.logger.error(
         `Unhandled exception: ${exception.message}`,
         exception.stack,
-        'GlobalExceptionFilter'
+        'GlobalExceptionFilter',
       );
     } else {
       // Cas d'erreur inconnue - éviter les logs vides
       this.logger.error(
         'Unknown exception occurred',
         JSON.stringify(exception),
-        'GlobalExceptionFilter'
+        'GlobalExceptionFilter',
       );
     }
 
@@ -55,7 +55,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       this.logger.error(
         `${request.method} ${request.url} - ${status} ${error}`,
         undefined,
-        'HTTP'
+        'HTTP',
       );
     }
 
@@ -70,4 +70,4 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     response.status(status).send(errorResponse);
   }
-} 
+}
