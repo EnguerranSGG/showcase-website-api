@@ -1,4 +1,4 @@
-import 'reflect-metadata';            
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -39,7 +39,10 @@ async function bootstrap() {
     },
   });
 
-  if (process.env.NODE_ENV === 'development' && process.env.DEBUG_REQUESTS === 'true') {
+  if (
+    process.env.NODE_ENV === 'development' &&
+    process.env.DEBUG_REQUESTS === 'true'
+  ) {
     fastify.addHook('preValidation', (request, reply, done) => {
       if (request.body && Object.keys(request.body).length > 0) {
         console.log('--- RAW BODY ---');
@@ -74,7 +77,10 @@ async function bootstrap() {
   );
 
   await app.register(fastifyCors, {
-    origin: process.env.FRONTEND_ORIGIN || 'http://localhost:4200' || 'http://localhost:4321',
+    origin:
+      process.env.FRONTEND_ORIGIN ||
+      'http://localhost:4200' ||
+      'http://localhost:4321',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   });
@@ -87,6 +93,6 @@ async function bootstrap() {
 }
 
 bootstrap().catch((error) => {
-  console.error('❌ Erreur lors du démarrage de l\'application:', error);
+  console.error("❌ Erreur lors du démarrage de l'application:", error);
   process.exit(1);
 });
