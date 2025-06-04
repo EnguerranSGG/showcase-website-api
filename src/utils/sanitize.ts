@@ -14,7 +14,7 @@ export function sanitizeObject(obj: any): any {
     return sanitizeInput(obj);
   } else if (Array.isArray(obj)) {
     // Handle arrays properly
-    return obj.map(item => sanitizeObject(item));
+    return obj.map((item) => sanitizeObject(item));
   } else if (typeof obj === 'object' && obj !== null) {
     const sanitized: any = {};
     for (const key in obj) {
