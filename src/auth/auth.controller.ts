@@ -13,6 +13,7 @@ import { RegisterDto } from './dto/register.dto';
 import { UpdateUserRefreshTokenDto } from './dto/refresh.dto';
 import { LoginDto } from './dto/login.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { WriteThrottle } from './decorators/throttle.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +24,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @WriteThrottle()
   @Post('addUser')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
@@ -36,7 +38,7 @@ export class AuthController {
   @Put('refresh')
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Met à jour le refresh token de l’utilisateur connecté',
+    summary: 'Met a jour le refresh token de l\'utilisateur connecte',
   })
   refresh(@Req() req, @Body() dto: UpdateUserRefreshTokenDto) {
     const userId = req.user.sub;
