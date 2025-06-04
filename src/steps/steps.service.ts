@@ -35,7 +35,9 @@ export class StepsService {
       data: {
         name: dto.name,
         description: dto.description,
-        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
+        file: dto.file_id
+          ? { connect: { file_id: dto.file_id } }
+          : { disconnect: true },
         path: { connect: { path_id: dto.path_id } },
         user: { connect: { user_id: userUuid } },
         updated_at: new Date(),
