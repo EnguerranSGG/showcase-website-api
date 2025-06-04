@@ -43,27 +43,30 @@ async function main() {
   }
 
   const files = [
-    'solidarite.png',
-    'photo-boutique-nouvoulook.jpg',
-    'logo-marcq.jpg',
-    'logo-cravate-solidaire.jpg',
-    'logo-cofidis.png',
-    'inclusion.png',
-    'immeuble.jpg',
-    'image-accueil.jpg',
-    'dignite.png',
-    'defile-nouvoulook.jpg',
-    'cours-FLE.jpg',
-    'entretien.jpg',
-    'DDETS_logo.png',
-    'logo-region.png',
-    'Ofii-logo.jpg',
-    'Plaquette-FLE.pdf',
-    'organigrame-air.png',
-    'certificat-qualiopi-AIR.pdf'
+    { filename: 'solidarite.png' },
+    { filename: 'photo-boutique-nouvoulook.jpg' },
+    { filename: 'logo-marcq.jpg' },
+    { filename: 'logo-cravate-solidaire.jpg' },
+    { filename: 'logo-cofidis.png' },
+    { filename: 'inclusion.png' },
+    { filename: 'immeuble.jpg' },
+    { filename: 'image-accueil.jpg', title: 'Accueil, Insertion, Rencontre' },
+    { filename: 'dignite.png' },
+    { filename: 'defile-nouvoulook.jpg' },
+    {
+      filename: 'cours-FLE.jpg',
+      title: 'Pôle formation : Français Langue Étrangère',
+    },
+    { filename: 'entretien.jpg' },
+    { filename: 'DDETS_logo.png' },
+    { filename: 'logo-region.png' },
+    { filename: 'Ofii-logo.jpg' },
+    { filename: 'Plaquette-FLE.pdf' },
+    { filename: 'organigrame-air.png', title: 'Organigramme' },
+    { filename: 'certificat-qualiopi-AIR.pdf' },
   ];
 
-  for (const filename of files) {
+  for (const { filename, title } of files) {
     const fileBuffer = readFileSync(join(__dirname, 'seed-files', filename));
 
     await prisma.file.create({
@@ -73,6 +76,7 @@ async function main() {
         created_at: new Date(),
         updated_at: new Date(),
         user_id: admin.user_id,
+        ...(title && { title }), // Ajoute le title seulement s'il existe
       },
     });
   }
@@ -287,13 +291,14 @@ async function main() {
   const news = [
     {
       name: 'Français langue étrangère : nouvelle session',
-      description: "L'association lance une nouvelle session de cours de français destinée aux demandeurs d'asile. Merci de faire passer l'information autour de vous à celles et ceux qui pourraient en bénéficier.",
+      description:
+        "L'association lance une nouvelle session de cours de français destinée aux demandeurs d'asile. Merci de faire passer l'information autour de vous à celles et ceux qui pourraient en bénéficier.",
       created_at: now,
       updated_at: now,
       file_id: 11,
       user_id: admin.user_id,
-    }
-  ]
+    },
+  ];
 
   await prisma.news.createMany({
     data: news,
@@ -585,10 +590,10 @@ async function main() {
       user_id: admin.user_id,
     },
     {
-      label: 'je sais pas quoi',
-      value: 5,
+      label: 'de satisfactions des accompagnés',
+      value: 96,
       year: 2024,
-      is_percentage: false,
+      is_percentage: true,
       created_at: now,
       updated_at: now,
       type_id: 2,
@@ -699,7 +704,6 @@ async function main() {
   });
 
   console.log('Etapes insérées avec succès.');
-
 
   const jobOffers = [
     {
