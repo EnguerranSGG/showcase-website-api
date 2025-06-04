@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { sanitize } from 'class-sanitizer';
 
@@ -18,7 +24,7 @@ export class CreateNewsDto {
   @IsOptional()
   @IsUrl()
   @MaxLength(255)
-  @Transform(({ value }) => value ? sanitize(value) : value)
+  @Transform(({ value }) => (value ? sanitize(value) : value))
   link?: string;
 
   @ApiProperty({ example: 'Description détaillée de la nouvelle importante.' })

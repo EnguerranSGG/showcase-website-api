@@ -34,7 +34,9 @@ export class NewsService {
       where: { news_id: id },
       data: {
         name: dto.name,
-        file: dto.file_id ? { connect: { file_id: dto.file_id } } : { disconnect: true },
+        file: dto.file_id
+          ? { connect: { file_id: dto.file_id } }
+          : { disconnect: true },
         link: dto.link ?? null,
         description: dto.description,
         user: { connect: { user_id: userUuid } },
@@ -61,7 +63,6 @@ export class NewsService {
       orderBy: { created_at: 'desc' },
     });
   }
-  
 
   async getAll() {
     return this.prisma.news.findMany({
