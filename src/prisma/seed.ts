@@ -136,6 +136,45 @@ async function main() {
 
   console.log('Partenaires insérés avec succès.');
 
+  // Insertion de quelques conseillers fictifs
+
+  const counselors = [
+    {
+      counselor_firstname: 'Dieudonné',
+      counselor_lastname: 'Mamadou',
+      counselor_function: 'Président',
+      counselor_presentation: 'Description d\'un conseiller',
+      user_id: admin.user_id,
+    },
+    {
+      counselor_firstname: 'Nathalie',
+      counselor_lastname: 'Chantrel',
+      counselor_function: 'Directrice',
+      counselor_presentation: 'Description d\'un conseiller',
+      user_id: admin.user_id,
+    },
+    {
+      counselor_firstname: 'Coralie',
+      counselor_lastname: 'Olivier',
+      counselor_function: 'Coordinatrice qualité',
+      counselor_presentation: 'Description d\'un conseiller',
+      user_id: admin.user_id,
+    },
+    {
+      counselor_firstname: 'Christiane',
+      counselor_lastname: 'Shamshoodeen',
+      counselor_function: 'Secrétaire',
+      counselor_presentation: 'Description d\'un conseiller',
+      user_id: admin.user_id,
+    },
+  ];
+
+  await prisma.counselor.createMany({
+    data: counselors,
+  });
+
+  console.log('Conseillers insérés avec succès.');
+
   // Insertion de quelques événements temporels
   const times = [
     {
