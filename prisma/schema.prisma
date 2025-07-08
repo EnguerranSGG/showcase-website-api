@@ -39,6 +39,7 @@ model User {
   steps        Step[]
   files        File[]
   missions     Mission[]
+  counselors   Counselor[]
 
   @@map("users")
 }
@@ -54,6 +55,18 @@ model Partner {
   user         User     @relation(fields: [user_id], references: [user_id])
 
   @@map("partners")
+}
+
+model Counselor {
+  counselor_id            Int      @id @default(autoincrement())
+  counselor_firstname      String
+  counselor_lastname       String
+  counselor_function       String
+  counselor_presentation   String
+  user_id                  String
+
+  user                    User     @relation(fields: [user_id], references: [user_id])
+  @@map("counselors")
 }
 
 model Time {
@@ -77,6 +90,7 @@ model Job_offer {
   description  String
   created_at   DateTime
   updated_at   DateTime
+
   file_id      Int?
   file         File?    @relation("JobOfferToFile", fields: [file_id], references: [file_id])
   user_id      String
