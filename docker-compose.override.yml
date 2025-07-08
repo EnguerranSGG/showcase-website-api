@@ -6,8 +6,8 @@ services:
     ports:
       - "4321:4321"
     environment:
-      - PUBLIC_API_URL=http://showcase-api:3000/api
-      - PUBLIC_ASSET_URL=http://localhost:3000/api
+      - PUBLIC_API_URL=${PUBLIC_API_URL}
+      - PUBLIC_ASSET_URL=${PUBLIC_ASSET_URL}
     depends_on:
       - api
 
@@ -18,6 +18,6 @@ services:
     ports:
       - "4200:4200"
     environment:
-      - API_URL=http://showcase-api:3000
+      - API_URL=${API_URL}
     depends_on:
       - api
