@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_FILTER } from '@nestjs/core';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -23,6 +22,7 @@ import { ValuesModule } from './values/values.module';
 import { FilesModule } from './files/files.module';
 import { MissionsModule } from './missions/missions.modules';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { CounselorsModule } from './counselors/counselors.module';
 
 @Module({
   imports: [
@@ -42,6 +42,7 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
     NewsModule,
     ValuesModule,
     FilesModule,
+    CounselorsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
