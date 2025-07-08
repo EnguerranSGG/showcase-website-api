@@ -26,40 +26,6 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 
 @Module({
   imports: [
-    // Configuration du rate limiting global et spécialisé
-    ThrottlerModule.forRoot([
-      {
-        name: 'short',
-        ttl: 60000, // 1 minute
-        limit: 20, // 20 requêtes par minute par IP
-      },
-      {
-        name: 'medium', 
-        ttl: 300000, // 5 minutes
-        limit: 100, // 100 requêtes par 5 minutes par IP
-      },
-      {
-        name: 'long',
-        ttl: 3600000, // 1 heure
-        limit: 1000, // 1000 requêtes par heure par IP
-      },
-      // Limiteurs spécialisés
-      {
-        name: 'auth',
-        ttl: 60000, // 1 minute
-        limit: 5, // 5 tentatives de connexion par minute
-      },
-      {
-        name: 'upload',
-        ttl: 60000, // 1 minute
-        limit: 10, // 10 uploads par minute
-      },
-      {
-        name: 'write',
-        ttl: 60000, // 1 minute
-        limit: 30, // 30 opérations d'écriture par minute
-      },
-    ]),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -91,10 +57,6 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
     },
     {
       provide: APP_FILTER,
