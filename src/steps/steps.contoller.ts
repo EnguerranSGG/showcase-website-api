@@ -25,12 +25,14 @@ import { Public } from '../auth/decorators/public.decorator';
 import { PublicGuard } from 'src/auth/guards/public.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
 
 @ApiTags('Steps')
 @Controller('steps')
 export class StepsController {
   constructor(private readonly stepsService: StepsService) {}
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -41,6 +43,7 @@ export class StepsController {
     return this.stepsService.create(dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -53,6 +56,7 @@ export class StepsController {
     return this.stepsService.update(Number(id), dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -65,6 +69,7 @@ export class StepsController {
     return this.stepsService.delete(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -77,6 +82,7 @@ export class StepsController {
     return this.stepsService.getById(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
   @Get('by-path/:pathId')
@@ -87,6 +93,7 @@ export class StepsController {
     return this.stepsService.getStepsByPathId(Number(pathId));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()

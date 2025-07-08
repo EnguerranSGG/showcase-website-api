@@ -25,12 +25,15 @@ import { Public } from '../auth/decorators/public.decorator';
 import { PublicGuard } from 'src/auth/guards/public.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
+
 
 @ApiTags('News')
 @Controller('news')
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -41,6 +44,7 @@ export class NewsController {
     return this.newsService.create(dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -56,6 +60,7 @@ export class NewsController {
     return this.newsService.update(Number(id), dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -68,6 +73,7 @@ export class NewsController {
     return this.newsService.delete(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -80,6 +86,7 @@ export class NewsController {
     return this.newsService.getById(Number(id));
   }
 
+  @GetThrottle()
   @Get('latest')
   @UseGuards(PublicGuard)
   @Public()
@@ -92,6 +99,7 @@ export class NewsController {
     return this.newsService.getLatest();
   }
 
+  @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
   @Get('all')

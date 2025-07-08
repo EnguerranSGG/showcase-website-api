@@ -25,12 +25,14 @@ import { Public } from '../auth/decorators/public.decorator';
 import { PublicGuard } from 'src/auth/guards/public.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
 
 @ApiTags('Statistics')
 @Controller('statistics')
 export class StatisticsController {
   constructor(private readonly statisticsService: StatisticsService) {}
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -41,6 +43,7 @@ export class StatisticsController {
     return this.statisticsService.create(dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -60,6 +63,7 @@ export class StatisticsController {
     return this.statisticsService.update(Number(id), dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -75,6 +79,7 @@ export class StatisticsController {
     return this.statisticsService.delete(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -90,6 +95,7 @@ export class StatisticsController {
     return this.statisticsService.getById(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
   @Get('by-type/:typeId')
@@ -103,6 +109,7 @@ export class StatisticsController {
     return this.statisticsService.getStatisticsByTypeId(Number(typeId));
   }
 
+  @GetThrottle()
   @Get('by-type-name/:typeName')
   @UseGuards(PublicGuard)
   @Public()
@@ -115,6 +122,7 @@ export class StatisticsController {
     return this.statisticsService.getByTypeName(typeName);
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()

@@ -25,12 +25,15 @@ import { Public } from '../auth/decorators/public.decorator';
 import { PublicGuard } from 'src/auth/guards/public.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
+
 
 @ApiTags('JobOffers')
 @Controller('jobOffers')
 export class JobOffersController {
   constructor(private readonly jobOffersService: JobOffersService) {}
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -44,6 +47,7 @@ export class JobOffersController {
     return this.jobOffersService.create(dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -63,6 +67,7 @@ export class JobOffersController {
     return this.jobOffersService.update(Number(id), dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -78,6 +83,7 @@ export class JobOffersController {
     return this.jobOffersService.delete(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -93,6 +99,7 @@ export class JobOffersController {
     return this.jobOffersService.getById(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
   @Get('all')

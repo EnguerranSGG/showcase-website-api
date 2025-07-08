@@ -25,12 +25,15 @@ import { Public } from '../auth/decorators/public.decorator';
 import { PublicGuard } from 'src/auth/guards/public.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
+
 
 @ApiTags('Partners')
 @Controller('partners')
 export class PartnersController {
   constructor(private readonly partnersService: PartnersService) {}
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -41,6 +44,7 @@ export class PartnersController {
     return this.partnersService.create(dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -60,6 +64,7 @@ export class PartnersController {
     return this.partnersService.update(Number(id), dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -72,6 +77,7 @@ export class PartnersController {
     return this.partnersService.delete(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -84,6 +90,7 @@ export class PartnersController {
     return this.partnersService.getById(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
   @Get()

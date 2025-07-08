@@ -23,12 +23,14 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { Public } from '../auth/decorators/public.decorator';
+import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
 
 @ApiTags('Paths')
 @Controller('paths')
 export class PathsController {
   constructor(private readonly pathsService: PathsService) {}
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -39,6 +41,7 @@ export class PathsController {
     return this.pathsService.create(dto);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -51,6 +54,7 @@ export class PathsController {
     return this.pathsService.update(Number(id), dto);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -63,6 +67,7 @@ export class PathsController {
     return this.pathsService.delete(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -75,6 +80,7 @@ export class PathsController {
     return this.pathsService.getById(Number(id));
   }
 
+  @GetThrottle()
   @Public()
   @Get(':id/steps')
   @ApiOperation({ summary: 'Récupérer les étapes associées à un parcours' })
@@ -84,6 +90,7 @@ export class PathsController {
     return this.pathsService.getStepsPathById(Number(id));
   }
 
+  @GetThrottle()
   @Public()
   @Get('by-name/:name')
   @ApiResponse({ status: 200, description: 'Étapes récupérées avec succès.' })
@@ -91,6 +98,7 @@ export class PathsController {
     return this.pathsService.findByName(name);
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()

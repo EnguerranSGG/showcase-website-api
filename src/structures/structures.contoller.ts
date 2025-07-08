@@ -26,6 +26,7 @@ import { PublicGuard } from 'src/auth/guards/public.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { Logger } from '@nestjs/common';
+import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
 
 @ApiTags('Structures')
 @Controller('structures')
@@ -34,6 +35,7 @@ export class StructuresController {
 
   constructor(private readonly structuresService: StructuresService) {}
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -53,6 +55,7 @@ export class StructuresController {
     return this.structuresService.create(dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -72,6 +75,7 @@ export class StructuresController {
     return this.structuresService.update(Number(id), dto, req.user.user_id);
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -84,6 +88,7 @@ export class StructuresController {
     return this.structuresService.delete(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -96,6 +101,7 @@ export class StructuresController {
     return this.structuresService.getById(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
   @Get('all')

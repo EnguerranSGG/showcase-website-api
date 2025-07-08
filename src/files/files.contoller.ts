@@ -27,7 +27,7 @@ import { Role } from '@prisma/client';
 import { NotFoundException } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { Res } from '@nestjs/common';
-import { UploadThrottle } from '../auth/decorators/throttle.decorator';
+import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
 
 import { lookup } from 'mime-types';
 
@@ -35,7 +35,7 @@ import { lookup } from 'mime-types';
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  @UploadThrottle()
+  @WriteThrottle()
   @Post('upload')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
@@ -84,7 +84,7 @@ export class FilesController {
     );
   }
 
-  @UploadThrottle()
+  @WriteThrottle()
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
@@ -124,6 +124,7 @@ export class FilesController {
     );
   }
 
+  @WriteThrottle()
   @Put(':id/metadata')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
@@ -158,6 +159,7 @@ export class FilesController {
     );
   }
 
+  @WriteThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -170,6 +172,7 @@ export class FilesController {
     return this.filesService.delete(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
@@ -182,6 +185,7 @@ export class FilesController {
     return this.filesService.getById(Number(id));
   }
 
+  @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
   @Get('all')
@@ -194,6 +198,7 @@ export class FilesController {
     return this.filesService.getAll();
   }
 
+  @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
   @Get(':id/title')
@@ -219,6 +224,7 @@ export class FilesController {
       .send(result.title || '');
   }
 
+  @GetThrottle()
   @ApiTags('Files')
   @Get(':id/download')
   @Public()
