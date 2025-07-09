@@ -20,26 +20,27 @@ enum Role {
 }
 
 model User {
-  user_id      String      @id @default(uuid())
-  firstname    String
-  lastname     String
-  mail         String      @unique
-  password     String
-  role         Role        @default(USER)
-  refreshToken String?
-  created_at   DateTime
-  updated_at   DateTime
-  partners     Partner[]
-  times        Time[]
-  jobOffers    Job_offer[]
-  structures   Structure[]
-  statistics   Statistic[]
-  news         News[]
-  values       Value[]
-  steps        Step[]
-  files        File[]
-  missions     Mission[]
-  counselors   Counselor[]
+  user_id         String      @id @default(uuid())
+  firstname       String
+  lastname        String
+  mail            String      @unique
+  password        String
+  role            Role        @default(USER)
+  refreshToken    String?
+  created_at      DateTime
+  updated_at      DateTime
+  partners        Partner[]
+  times           Time[]
+  jobOffers       Job_offer[]
+  structures      Structure[]
+  statistics      Statistic[]
+  news            News[]
+  values          Value[]
+  steps           Step[]
+  files           File[]
+  missions        Mission[]
+  counselors      Counselor[]
+  presentations   Presentation[]
 
   @@map("users")
 }
@@ -67,6 +68,15 @@ model Counselor {
 
   user                    User     @relation(fields: [user_id], references: [user_id])
   @@map("counselors")
+}
+
+model Presentation {
+  presentation_id            Int      @id @default(autoincrement())
+  presentation_text          String
+  user_id                    String
+
+  user                       User     @relation(fields: [user_id], references: [user_id])
+  @@map("presentations")
 }
 
 model Time {
