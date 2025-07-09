@@ -43,27 +43,34 @@ async function main() {
   }
 
   const files = [
-    { filename: 'solidarite.png' },
-    { filename: 'photo-boutique-nouvoulook.jpg' },
-    { filename: 'logo-marcq.jpg' },
-    { filename: 'logo-cravate-solidaire.jpg' },
-    { filename: 'logo-cofidis.png' },
-    { filename: 'inclusion.png' },
-    { filename: 'immeuble.jpg' },
-    { filename: 'image-accueil.jpg', title: 'Accueil, Insertion, Rencontre' },
-    { filename: 'dignite.png' },
-    { filename: 'defile-nouvoulook.jpg' },
+    { filename: 'solidarite.png' }, //1
+    { filename: 'photo-boutique-nouvoulook.jpg' }, //2
+    { filename: 'logo-marcq.jpg' }, //3
+    { filename: 'logo-cravate-solidaire.jpg' }, //4
+    { filename: 'logo-cofidis.png' }, //5
+    { filename: 'inclusion.png' }, //6
+    { filename: 'immeuble.jpg' }, //7
+    { filename: 'image-accueil.jpg', title: 'Accueil, Insertion, Rencontre' }, //8
+    { filename: 'dignite.png' }, //9
+    { filename: 'defile-nouvoulook.jpg' }, //10
     {
       filename: 'cours-FLE.jpg',
-      title: 'Pôle formation : Français Langue Étrangère',
+      title: 'Pôle formation : Français Langue Étrangère', //11
     },
-    { filename: 'entretien.jpg' },
-    { filename: 'DDETS_logo.png' },
-    { filename: 'logo-region.png' },
-    { filename: 'Ofii-logo.jpg' },
-    { filename: 'Plaquette-FLE.pdf' },
-    { filename: 'organigrame-air.png', title: 'Organigramme' },
-    { filename: 'certificat-qualiopi-AIR.pdf' },
+    { filename: 'entretien.jpg' }, //12
+    { filename: 'DDETS_logo.png' }, //13
+    { filename: 'logo-region.png' }, //14
+    { filename: 'Ofii-logo.jpg' }, //15
+    { filename: 'Plaquette-FLE.pdf' }, //16
+    { filename: 'organigrame-air.png', title: 'Organigramme' }, //17
+    { filename: 'certificat-qualiopi-AIR.pdf' }, //18
+    { filename: 'MARCQ CPH.jpg' }, //19
+    { filename: 'SIEGE.jpg' }, //20
+    { filename: 'ROUBAIX CADA CPH FLE HUDA.jpg' }, //21
+    { filename: 'FLE 2e étage.jpg' }, //22
+    { filename: 'FLE 2e étage.2.jpg' }, //23
+    { filename: 'FLE - 1er étage 2.jpg' }, //24
+    { filename: 'FLE - 1er étage 1.jpg' }, //25
   ];
 
   for (const { filename, title } of files) {
@@ -386,7 +393,7 @@ async function main() {
       phone_number: '03 76 89 07 54',
       created_at: now,
       updated_at: now,
-      file_id: 7,
+      file_id: 20,
       user_id: admin.user_id,
     },
     {
@@ -409,7 +416,7 @@ async function main() {
       link: 'https://www.association-air.fr/fle',
       created_at: now,
       updated_at: now,
-      file_id: 7,
+      file_id: 22,
       user_id: admin.user_id,
     },
     {
@@ -418,7 +425,7 @@ async function main() {
         'Ce Centre d’Accueil des Demandeurs d’Asile dispose d’un capacité d’accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
       created_at: now,
       updated_at: now,
-      file_id: 7,
+      file_id: 21,
       user_id: admin.user_id,
     },
     {
@@ -436,7 +443,7 @@ async function main() {
         'L’Hebergement d’Urgence des Demandeurs d’Asile dispose de 13 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
       created_at: now,
       updated_at: now,
-      file_id: 7,
+      file_id: 21,
       user_id: admin.user_id,
     },
     {
@@ -445,7 +452,7 @@ async function main() {
         'Ce Centre Provisoire d’Hébergement est destiné aux Bénéficiaires d’une Protection Internationale et dispose d’une capacité d’accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
       created_at: now,
       updated_at: now,
-      file_id: 7,
+      file_id: 19,
       user_id: admin.user_id,
     },
     {
@@ -454,7 +461,7 @@ async function main() {
         'Ce Centre Provisoire d’Hébergement est destiné aux Bénéficiaires d’une Protection Internationale et dispose d’une capacité d’accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
       created_at: now,
       updated_at: now,
-      file_id: 7,
+      file_id: 21,
       user_id: admin.user_id,
     },
     {
