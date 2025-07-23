@@ -67,10 +67,10 @@ async function main() {
     { filename: 'MARCQ CPH.jpg' }, //19
     { filename: 'SIEGE.jpg' }, //20
     { filename: 'ROUBAIX CADA CPH FLE HUDA.jpg' }, //21
-    { filename: 'FLE 2e étage.jpg' }, //22
-    { filename: 'FLE 2e étage.2.jpg' }, //23
-    { filename: 'FLE - 1er étage 2.jpg' }, //24
-    { filename: 'FLE - 1er étage 1.jpg' }, //25
+    { filename: 'FLE 2e etage.jpg' }, //22
+    { filename: 'FLE 2e etage.2.jpg' }, //23
+    { filename: 'FLE - 1er etage 2.jpg' }, //24
+    { filename: 'FLE - 1er etage 1.jpg' }, //25
   ];
 
   for (const { filename, title } of files) {
@@ -89,6 +89,26 @@ async function main() {
   }
 
   console.log('Fichiers insérés avec succès.');
+
+  // Insertion de quelques présentations fictives
+  const presentations = [
+    {
+      presentation_text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mollis nisi lectus, quis egestas est convallis vitae. Donec maximus lobortis massa, vitae ultrices diam aliquet et. Phasellus at porttitor risus, eget elementum dui. Vestibulum molestie congue pretium. Suspendisse consequat nisl at dapibus viverra. Vestibulum est sapien, rhoncus et diam et, porta faucibus risus. Fusce efficitur lectus. ',
+      user_id: admin.user_id,
+    },
+    {
+      presentation_text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mollis nisi lectus, quis egestas est convallis vitae. Donec maximus lobortis massa, vitae ultrices diam aliquet et. Phasellus at porttitor risus, eget elementum dui. Vestibulum molestie congue pretium. Suspendisse consequat nisl at dapibus viverra. Vestibulum est sapien, rhoncus et diam et, porta faucibus risus. Fusce efficitur lectus. ',
+      user_id: admin.user_id,
+    },
+    {
+      presentation_text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mollis nisi lectus, quis egestas est convallis vitae. Donec maximus lobortis massa, vitae ultrices diam aliquet et. Phasellus at porttitor risus, eget elementum dui. Vestibulum molestie congue pretium. Suspendisse consequat nisl at dapibus viverra. Vestibulum est sapien, rhoncus et diam et, porta faucibus risus. Fusce efficitur lectus. ',
+      user_id: admin.user_id,
+    }
+  ];
+  await prisma.presentation.createMany({
+    data: presentations,
+  });
+  console.log('Présentations insérées avec succès.');
 
   // Insertion de quelques partenaires fictifs
   const now = new Date();
