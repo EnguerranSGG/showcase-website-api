@@ -23,6 +23,7 @@ import { FilesModule } from './files/files.module';
 import { MissionsModule } from './missions/missions.modules';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { CounselorsModule } from './counselors/counselors.module';
+import { PresentationsModule } from './presentations/presentations.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { CounselorsModule } from './counselors/counselors.module';
     ValuesModule,
     FilesModule,
     CounselorsModule,
+    PresentationsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
