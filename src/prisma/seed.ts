@@ -50,7 +50,7 @@ async function main() {
     { filename: 'logo-cofidis.png' }, //5
     { filename: 'inclusion.png' }, //6
     { filename: 'immeuble.jpg' }, //7
-    { filename: 'image-accueil.jpg', title: 'Accueil, Insertion, Rencontre' }, //8
+    { filename: 'image-accueil.jpg', title: 'Accueil Insertion Rencontre' }, //8
     { filename: 'dignite.png' }, //9
     { filename: 'defile-nouvoulook.jpg' }, //10
     {
@@ -71,6 +71,11 @@ async function main() {
     { filename: 'FLE 2e etage.2.jpg' }, //23
     { filename: 'FLE - 1er etage 2.jpg' }, //24
     { filename: 'FLE - 1er etage 1.jpg' }, //25
+    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Satisfaction des stagiaires' }, //26
+    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Auto-évaluations' }, //27
+    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Acquisitions des compétences' }, //28
+    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Auto-évaluations' }, //29
+    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Acquisitions des compétences' }, //30
   ];
 
   for (const { filename, title } of files) {
@@ -94,15 +99,15 @@ async function main() {
   const presentations = [
     {
       presentation_text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mollis nisi lectus, quis egestas est convallis vitae. Donec maximus lobortis massa, vitae ultrices diam aliquet et. Phasellus at porttitor risus, eget elementum dui. Vestibulum molestie congue pretium. Suspendisse consequat nisl at dapibus viverra. Vestibulum est sapien, rhoncus et diam et, porta faucibus risus. Fusce efficitur lectus. ',
-      user_id: admin.user_id,
+      user_id: admin.user_id, //1
     },
     {
       presentation_text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mollis nisi lectus, quis egestas est convallis vitae. Donec maximus lobortis massa, vitae ultrices diam aliquet et. Phasellus at porttitor risus, eget elementum dui. Vestibulum molestie congue pretium. Suspendisse consequat nisl at dapibus viverra. Vestibulum est sapien, rhoncus et diam et, porta faucibus risus. Fusce efficitur lectus. ',
-      user_id: admin.user_id,
+      user_id: admin.user_id, //2
     },
     {
       presentation_text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mollis nisi lectus, quis egestas est convallis vitae. Donec maximus lobortis massa, vitae ultrices diam aliquet et. Phasellus at porttitor risus, eget elementum dui. Vestibulum molestie congue pretium. Suspendisse consequat nisl at dapibus viverra. Vestibulum est sapien, rhoncus et diam et, porta faucibus risus. Fusce efficitur lectus. ',
-      user_id: admin.user_id,
+      user_id: admin.user_id, //3
     }
   ];
   await prisma.presentation.createMany({
@@ -404,94 +409,144 @@ async function main() {
 
   console.log('Valeurs insérées avec succès.');
 
+  // Types de structures - DOIT ÊTRE AVANT LES STRUCTURES
+  const structureTypes = [
+    {
+      name: 'Boutique solidaire',
+      created_at: now,
+      updated_at: now,
+    },
+    {
+      name: 'Pôle formation',
+      created_at: now,
+      updated_at: now,
+    },
+    {
+      name: 'Pôle asile',
+      created_at: now,
+      updated_at: now,
+    },
+    {
+      name: 'Pôle intégration',
+      created_at: now,
+      updated_at: now,
+    },
+    {
+      name: 'Siège social',
+      created_at: now,
+      updated_at: now,
+    },
+  ];
+
+  await prisma.structureType.createMany({
+    data: structureTypes,
+  });
+
+  console.log('Types de structures insérées avec succès.');
+
+  // Récupérer les types de structures créés pour avoir leurs IDs
+  const createdStructureTypes = await prisma.structureType.findMany();
+  const structureTypeMap = new Map(
+    createdStructureTypes.map(type => [type.name, type.structure_type_id])
+  );
+
   const structures = [
     {
       name: 'Siège social',
       description:
         'Le siège social accueil le pôle direction de A.I.R. ainsi que les emplois administratifs.',
       address: '108 rue Jean Jacques Rousseau, Hellemmes',
-      phone_number: '03 76 89 07 54',
+      phone_number: '03 20 04 16 85',
       created_at: now,
       updated_at: now,
       file_id: 20,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Siège social'),
     },
     {
       name: 'Boutique Nouvoulook',
       description:
-        'La boutique Nouvoulook est une boutique solidaire associative de seconde main. Elle est financée par la vente de dons de particuliers et d’entreprises. Son fonctionnement est assurée par des membres de l’association A.I.R. et des bénévoles.',
+        'La boutique Nouvoulook est une boutique solidaire associative de seconde main. Elle est financée par la vente de dons de particuliers et d\'entreprises. Son fonctionnement est assurée par des membres de l\'association A.I.R. et des bénévoles.',
       address: '65 bd Clémenceau, Marcq-en-Baroeul',
       phone_number: '03 28 07 66 52',
-      link: 'https://www.nouvoulook.fr/',
+      link: 'https://www.Nouvoulook.fr/',
       created_at: now,
       updated_at: now,
       file_id: 2,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Boutique solidaire'),
     },
     {
       name: 'Pôle formations : Français Langue Étrangère',
       description:
-        'Le FLE est certifié QUALIOPI et est financé par la DDETS. Il propose des cours d’initiation au code de la route et de FLE à visée d’intégration socio-professionnelle et  d’accompagnement à l’autonomie numérique.',
+        'Le FLE est certifié QUALIOPI et est financé par la DDETS. Il propose des cours d\'initiation au code de la route et de FLE à visée d\'intégration socio-professionnelle et  d\'accompagnement à l\'autonomie numérique.',
       address: '31 Grand Place, Roubaix 59100',
-      link: 'https://www.association-air.fr/fle',
+      link: 'https://www.Accueil-insertion-rencontre.fr/fle',
       created_at: now,
       updated_at: now,
       file_id: 22,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Pôle formation'),
     },
     {
       name: 'CADA - Roubaix',
       description:
-        'Ce Centre d’Accueil des Demandeurs d’Asile dispose d’un capacité d’accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
+        'Ce Centre d\'Accueil des Demandeurs d\'Asile dispose d\'un capacité d\'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
       created_at: now,
       updated_at: now,
       file_id: 21,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Pôle asile'),
     },
     {
       name: 'CADA - Tourcouing',
       description:
-        'Ce Centre d’Accueil des Demandeurs d’Asile dispose d’un capacité d’accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
+        'Ce Centre d\'Accueil des Demandeurs d\'Asile dispose d\'un capacité d\'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
       created_at: now,
       updated_at: now,
       file_id: 7,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Pôle asile'),
     },
     {
       name: 'HUDA - Roubaix',
       description:
-        'L’Hebergement d’Urgence des Demandeurs d’Asile dispose de 13 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
+        'L\'Hebergement d\'Urgence des Demandeurs d\'Asile dispose de 13 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
       created_at: now,
       updated_at: now,
       file_id: 21,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Pôle asile'),
     },
     {
       name: 'CPH - Marcq-en-Baroeul',
       description:
-        'Ce Centre Provisoire d’Hébergement est destiné aux Bénéficiaires d’une Protection Internationale et dispose d’une capacité d’accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
+        'Ce Centre Provisoire d\'Hébergement est destiné aux Bénéficiaires d\'une Protection Internationale et dispose d\'une capacité d\'accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
       created_at: now,
       updated_at: now,
       file_id: 19,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Pôle intégration'),
     },
     {
       name: 'CPH - Roubaix',
       description:
-        'Ce Centre Provisoire d’Hébergement est destiné aux Bénéficiaires d’une Protection Internationale et dispose d’une capacité d’accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l’OFII via le DNA.',
+        'Ce Centre Provisoire d\'Hébergement est destiné aux Bénéficiaires d\'une Protection Internationale et dispose d\'une capacité d\'accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
       created_at: now,
       updated_at: now,
       file_id: 21,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Pôle intégration'),
     },
     {
-      name: 'Centre de stabilisation',
+      name: 'CHRS',
       description:
-        'C’est un Centre d’Hébergement et de Réinsertion Sociale destiné aux femmes isolées et en situation de grande précarité. Il est régi par le CASF et est financé par la DDETS. Les orientations vers cet établissement sont gérées par le SIAO.',
+        'C\'est un Centre d\'Hébergement et de Réinsertion Sociale destiné aux femmes isolées et en situation de grande précarité. Il est régi par le CASF et est financé par la DDETS. Les orientations vers cet établissement sont gérées par le SIAO.',
       created_at: now,
       updated_at: now,
       file_id: 7,
       user_id: admin.user_id,
+      structure_type_id: structureTypeMap.get('Pôle intégration'),
     },
   ];
 
