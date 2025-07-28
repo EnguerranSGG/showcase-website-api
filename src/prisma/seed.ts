@@ -76,6 +76,8 @@ async function main() {
     { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Acquisitions des compétences' }, //28
     { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Auto-évaluations' }, //29
     { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Acquisitions des compétences' }, //30
+    { filename: 'logo_fondation-FACE.png' }, //31
+    { filename: 'logo-uriopss.png' }, //32
   ];
 
   for (const { filename, title } of files) {
@@ -119,6 +121,42 @@ async function main() {
   const now = new Date();
   const partners = [
     {
+      name: 'DDETS',
+      created_at: now,
+      updated_at: now,
+      file_id: 13,
+      user_id: admin.user_id,
+    },
+    ,
+    {
+      name: 'Région Hauts-de-France',
+      created_at: now,
+      updated_at: now,
+      file_id: 14,
+      user_id: admin.user_id,
+    },
+    {
+      name: 'Offi',
+      created_at: now,
+      updated_at: now,
+      file_id: 15,
+      user_id: admin.user_id,
+    },
+    {
+      name: 'Fondation Face',
+      created_at: now,
+      updated_at: now,
+      file_id: 31,
+      user_id: admin.user_id,
+    },
+    {
+      name: 'URIOPS',
+      created_at: now,
+      updated_at: now,
+      file_id: 32,
+      user_id: admin.user_id,
+    },
+    {
       name: 'Marcq-en-Baroeul',
       created_at: now,
       updated_at: now,
@@ -138,28 +176,7 @@ async function main() {
       updated_at: now,
       file_id: 4,
       user_id: admin.user_id,
-    },
-    {
-      name: 'Région Hauts-de-France',
-      created_at: now,
-      updated_at: now,
-      file_id: 14,
-      user_id: admin.user_id,
-    },
-    {
-      name: 'DDETS',
-      created_at: now,
-      updated_at: now,
-      file_id: 13,
-      user_id: admin.user_id,
-    },
-    {
-      name: 'Offi',
-      created_at: now,
-      updated_at: now,
-      file_id: 15,
-      user_id: admin.user_id,
-    },
+    }
   ];
 
   await prisma.partner.createMany({
