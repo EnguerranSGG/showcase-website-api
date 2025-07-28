@@ -17,6 +17,7 @@ import { JobOffersModule } from './job-offers/job-offers.module';
 import { TimesModule } from './times/times.module';
 import { PartnersModule } from './partners/partners.module';
 import { StructuresModule } from './structures/structures.module';
+import { StructureTypesModule } from './structure-types/structure-types.module';
 import { NewsModule } from './news/news.module';
 import { ValuesModule } from './values/values.module';
 import { FilesModule } from './files/files.module';
@@ -39,6 +40,7 @@ import { PresentationsModule } from './presentations/presentations.module';
     TimesModule,
     PartnersModule,
     StructuresModule,
+    StructureTypesModule,
     MissionsModule,
     NewsModule,
     ValuesModule,
