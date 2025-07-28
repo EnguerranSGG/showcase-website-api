@@ -13,6 +13,7 @@ export class StructuresService {
       data: {
         name: dto.name,
         file: dto.file_id ? { connect: { file_id: dto.file_id } } : undefined,
+        structure_type: dto.structure_type_id ? { connect: { structure_type_id: dto.structure_type_id } } : undefined,
         description: dto.description,
         address: dto.address ?? null,
         phone_number: dto.phone_number ?? null,
@@ -47,6 +48,9 @@ export class StructuresService {
         name: dto.name,
         file: dto.file_id
           ? { connect: { file_id: dto.file_id } }
+          : { disconnect: true },
+        structure_type: dto.structure_type_id
+          ? { connect: { structure_type_id: dto.structure_type_id } }
           : { disconnect: true },
         description: dto.description,
         address: dto.address,
@@ -98,7 +102,29 @@ export class StructuresService {
       include: {
         missions: true,
         file: true,
+        structure_type: true,
       },
     });
+  }
+
+  async getByTypeName(typeName: string) {
+    const structures = await this.prisma.structure.findMany({
+      where: {
+        structure_type: {
+          name: typeName,
+        },
+      },
+      include: {
+        missions: true,
+        file: true,
+        structure_type: true,
+      },
+    });
+
+    if (!structures || structures.length === 0) {
+      throw new NotFoundException(`Aucune structure trouvée pour le type: ${typeName}`);
+    }
+
+    return structures;
   }
 }

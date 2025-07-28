@@ -5,6 +5,7 @@ import {
   ValidateNested,
   IsArray,
   ArrayNotEmpty,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Transform } from 'class-transformer';
@@ -20,6 +21,10 @@ export class CreateStructureDto {
   @IsOptional()
   @Type(() => Number)
   file_id?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  structure_type_id?: number;
 
   @IsString()
   @MaxLength(330)

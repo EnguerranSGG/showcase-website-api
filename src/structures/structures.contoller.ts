@@ -113,4 +113,22 @@ export class StructuresController {
   getAll() {
     return this.structuresService.getAll();
   }
+
+  @GetThrottle()
+  @UseGuards(PublicGuard)
+  @Public()
+  @Get('by-type-name/:typeName')
+  @ApiOperation({ summary: 'Récupérer les structures par nom de type' })
+  @ApiParam({ name: 'typeName', type: String, description: 'Nom du type de structure' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des structures du type spécifié récupérée avec succès.',
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Aucune structure trouvée pour ce type.' 
+  })
+  getByTypeName(@Param('typeName') typeName: string) {
+    return this.structuresService.getByTypeName(typeName);
+  }
 }
