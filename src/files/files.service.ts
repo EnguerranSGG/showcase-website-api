@@ -9,7 +9,7 @@ import { UpdateFileDto } from './dto/update-file.dto';
 
 @Injectable()
 export class FilesService {
-  private readonly PROTECTED_FILE_IDS = [8, 11, 16, 17, 18];
+  private readonly PROTECTED_FILE_IDS = [8, 11, 16, 17, 18, 26, 27, 28, 29, 30];
 
   constructor(private readonly prisma: PrismaService) {}
 
