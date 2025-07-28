@@ -120,7 +120,9 @@ model Structure {
   updated_at   DateTime
   user_id      String
   file_id      Int?
+  structure_type_id Int?
   file         File?    @relation("StructureToFile", fields: [file_id], references: [file_id])
+  structure_type StructureType? @relation(fields: [structure_type_id], references: [structure_type_id])
   user         User      @relation(fields: [user_id], references: [user_id])
   missions     Mission[]
 
@@ -234,5 +236,15 @@ model Type {
   statistics Statistic[]
 
   @@map("types")
+}
+
+model StructureType {
+  structure_type_id Int         @id @default(autoincrement())
+  name              String      @unique
+  created_at        DateTime
+  updated_at        DateTime
+  structures        Structure[]
+
+  @@map("structure_types")
 }
 
