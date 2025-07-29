@@ -248,3 +248,14 @@ model StructureType {
   @@map("structure_types")
 }
 
+model PasswordReset {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@map("password_resets")
+}
+
