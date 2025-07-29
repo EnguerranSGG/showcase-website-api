@@ -103,11 +103,11 @@ async function main() {
       user_id: admin.user_id, //1
     },
     {
-      presentation_text: 'L\'association est née de l\'initiative de militants engagés dans le tourisme associatif et social, dans le formation et l\'éducation populaire et d\'une interpellation du secrétariat d\'État chargé de l\'action humanitaire. Le but était de créer un centre d\'accueil, appelé "Centre provisoire d\'hébergement (CPH) dans le Nord-Pas-de-Calais. \nL\'État français avait décidé d\'apporter son aide à la Grande-Bretagne, en accueillant 4400 réfugiés vietnamiens et cambodgiens, présents dans les camps de Hong-Kong (l\'île passant sous la gouvernance chinoise). \nL\'association, régie par la loi du 1er juillet 1901, est donc créée le 5 mars 1990. Le sens voulu de l\'action était d\'accueillir des personnes réfugiées en famille ou isolées et leur permettre une réelle insertion sociale et professionnelle. C\'est ainsi que le premier Centre Provisoire d\'Hébergement (CPH) ouvre ses portes en septembre 1990. \nPour les militants associatifs, il était primordial de permettre aux personnes accueillies de recevoir, dès l\'arrivée, une formation en Français Langue Étrangère (FLE) et un accompagnement social et professionnel.',
+      presentation_text: 'L\'association est née de l\'initiative de militants engagés dans le tourisme associatif et social, dans la formation et l\'éducation populaire et d\'une interpellation du secrétariat d\'État chargé de l\'action humanitaire. Le but était de créer un centre d\'accueil, appelé "Centre provisoire d\'hébergement" (CPH) dans le Nord-Pas-de-Calais. \nL\'État français avait décidé d\'apporter son aide à la Grande-Bretagne, en accueillant 4400 réfugiés vietnamiens et cambodgiens, présents dans les camps de Hong-Kong (l\'île passant sous la gouvernance chinoise). \nL\'association, régie par la loi du 1er juillet 1901, est donc créée le 5 mars 1990. Le sens voulu de l\'action était d\'accueillir des personnes réfugiées en famille ou isolées et leur permettre une réelle insertion sociale et professionnelle. C\'est ainsi que le premier Centre Provisoire d\'Hébergement (CPH) ouvre ses portes en septembre 1990. \nPour les militants associatifs, il était primordial de permettre aux personnes accueillies de recevoir, dès l\'arrivée, une formation en Français Langue Étrangère (FLE) et un accompagnement social et professionnel.',
       user_id: admin.user_id, //2
     },
     {
-      presentation_text: 'Rejoignez notre équipe et participez à notre mission sociale',
+      presentation_text: 'Rejoignez notre équipe et participez à notre mission sociale.',
       user_id: admin.user_id, //3
     },
   ];
@@ -259,7 +259,7 @@ async function main() {
     {
       year: 2002,
       event_description:
-        'Ouverture de 20 places d’herbergement d’urgence et création de la première plateforme d’accueil des demandeurs d’asile (SPADA) à Lille.',
+        'Ouverture de 20 places d’hébergement d’urgence et création de la première plateforme d’accueil des demandeurs d’asile (SPADA) à Lille.',
       created_at: now,
       updated_at: now,
       user_id: admin.user_id,
@@ -267,7 +267,7 @@ async function main() {
     {
       year: 2005,
       event_description:
-        'Pérennisation de 10 places d’herbergement d’urgence pour femmes isolées à Tourcoing.',
+        'Pérennisation de 10 places d’hébergement d’urgence pour femmes isolées à Tourcoing.',
       created_at: now,
       updated_at: now,
       user_id: admin.user_id,
@@ -275,7 +275,7 @@ async function main() {
     {
       year: 2007,
       event_description:
-        'Les 10 places d’herbergement d’urgence deviennent des places de stabilisation sous statut (CHRS).',
+        'Les 10 places d’hébergement d’urgence deviennent des places de stabilisation sous statut (CHRS).',
       created_at: now,
       updated_at: now,
       user_id: admin.user_id,
@@ -291,7 +291,7 @@ async function main() {
     {
       year: 2013,
       event_description:
-        'Accompagnement juridique et psychologiques des Mineurs Isolés Étrangers pour le compte de la protection judiciaire.',
+        'Accompagnement juridique et psychologique des Mineurs Isolés Étrangers pour le compte de la protection judiciaire.',
       created_at: now,
       updated_at: now,
       user_id: admin.user_id,
@@ -339,7 +339,7 @@ async function main() {
     {
       year: 2020,
       event_description:
-        'Absorbtion de l’association Innovation Développement comptant un pôle formation FLE à Roubaix et une boutique solidaire à Marc-en-Baroeul.',
+        'Absorption de l’association Innovation Développement comptant un pôle formation FLE à Roubaix et une boutique solidaire à Marc-en-Baroeul.',
       created_at: now,
       updated_at: now,
       user_id: admin.user_id,
@@ -353,7 +353,7 @@ async function main() {
     },
     {
       year: 2023,
-      event_description: 'Fin de la misssion du LAIR à Lille.',
+      event_description: 'Fin de la mission du LAIR à Lille.',
       created_at: now,
       updated_at: now,
       user_id: admin.user_id,
@@ -481,7 +481,7 @@ async function main() {
     {
       name: 'Boutique Nouvoulook',
       description:
-        'La boutique Nouvoulook est une boutique solidaire associative de seconde main. Elle est financée par la vente de dons de particuliers et d\'entreprises. Son fonctionnement est assurée par des membres de l\'association A.I.R. et des bénévoles.',
+        'La boutique Nouvoulook est une boutique solidaire associative de seconde main. Elle est financée par la vente de dons de particuliers et d\'entreprises. Son fonctionnement est assuré par des membres de l\'association A.I.R. et des bénévoles.',
       address: '65 bd Clémenceau, Marcq-en-Baroeul',
       phone_number: '03 28 07 66 52',
       link: 'https://www.Nouvoulook.fr/',
@@ -506,7 +506,7 @@ async function main() {
     {
       name: 'CADA - Roubaix',
       description:
-        'Ce Centre d\'Accueil des Demandeurs d\'Asile dispose d\'un capacité d\'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
+        'Ce Centre d\'Accueil des Demandeurs d\'Asile dispose d\'une capacité d\'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
       created_at: now,
       updated_at: now,
       file_id: 21,
@@ -514,9 +514,9 @@ async function main() {
       structure_type_id: structureTypeMap.get('Pôle asile'),
     },
     {
-      name: 'CADA - Tourcouing',
+      name: 'CADA - Tourcoing',
       description:
-        'Ce Centre d\'Accueil des Demandeurs d\'Asile dispose d\'un capacité d\'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
+        'Ce Centre d\'Accueil des Demandeurs d\'Asile dispose d\'une capacité d\'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
       created_at: now,
       updated_at: now,
       file_id: 7,
@@ -526,7 +526,7 @@ async function main() {
     {
       name: 'HUDA - Roubaix',
       description:
-        'L\'Hebergement d\'Urgence des Demandeurs d\'Asile dispose de 13 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
+        'L\'Hébergement d\'Urgence des Demandeurs d\'Asile dispose de 13 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
       created_at: now,
       updated_at: now,
       file_id: 21,
@@ -706,7 +706,7 @@ async function main() {
 
   const statistic = [
     {
-      label: "centres d'herbergement",
+      label: "centres d'hébergement",
       value: 7,
       year: 2024,
       is_percentage: false,
@@ -726,7 +726,7 @@ async function main() {
       user_id: admin.user_id,
     },
     {
-      label: 'de satisfactions des accompagnés',
+      label: 'de satisfaction des accompagnés',
       value: 96,
       year: 2024,
       is_percentage: true,
@@ -736,7 +736,7 @@ async function main() {
       user_id: admin.user_id,
     },
     {
-      label: "d'apprenants statisfaits",
+      label: "d'apprenants satisfaits",
       value: 98,
       year: 2024,
       is_percentage: true,
