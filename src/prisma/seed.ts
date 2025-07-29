@@ -105,7 +105,11 @@ async function main() {
     {
       presentation_text: 'L\'association est née de l\'initiative de militants engagés dans le tourisme associatif et social, dans le formation et l\'éducation populaire et d\'une interpellation du secrétariat d\'État chargé de l\'action humanitaire. Le but était de créer un centre d\'accueil, appelé "Centre provisoire d\'hébergement (CPH) dans le Nord-Pas-de-Calais. \nL\'État français avait décidé d\'apporter son aide à la Grande-Bretagne, en accueillant 4400 réfugiés vietnamiens et cambodgiens, présents dans les camps de Hong-Kong (l\'île passant sous la gouvernance chinoise). \nL\'association, régie par la loi du 1er juillet 1901, est donc créée le 5 mars 1990. Le sens voulu de l\'action était d\'accueillir des personnes réfugiées en famille ou isolées et leur permettre une réelle insertion sociale et professionnelle. C\'est ainsi que le premier Centre Provisoire d\'Hébergement (CPH) ouvre ses portes en septembre 1990. \nPour les militants associatifs, il était primordial de permettre aux personnes accueillies de recevoir, dès l\'arrivée, une formation en Français Langue Étrangère (FLE) et un accompagnement social et professionnel.',
       user_id: admin.user_id, //2
-    }
+    },
+    {
+      presentation_text: 'Rejoignez notre équipe et participez à notre mission sociale',
+      user_id: admin.user_id, //3
+    },
   ];
   await prisma.presentation.createMany({
     data: presentations,
