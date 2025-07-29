@@ -7,7 +7,7 @@ export class CreatePresentationDto {
   @ApiProperty({ example: 'Présentation de l\'association' })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(400)
+  @MaxLength(1200)
   @Transform(({ value }) => sanitize(value))
   presentation_text: string;
 }
