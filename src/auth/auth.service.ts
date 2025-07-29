@@ -2,14 +2,18 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { LoggerService } from 'src/common/logger/logger.service';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -135,6 +139,92 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
+    };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    this.logger.log(`Demande de réinitialisation de mot de passe pour : ${dto.email}`, 'AuthService');
+
+    // Vérifier que l'utilisateur existe
+    const user = await this.prisma.user.findUnique({
+      where: { mail: dto.email }
+    });
+
+    // Pour des raisons de sécurité, ne pas révéler si l'email existe
+    if (!user) {
+      this.logger.warn(`Demande de reset pour un email inexistant : ${dto.email}`, 'AuthService');
+      return { 
+        message: 'Si cet email existe dans notre base de données, un lien de réinitialisation a été envoyé.' 
+      };
+    }
+
+    // Générer un token unique et sécurisé
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Sauvegarder en base
+    await this.prisma.passwordReset.create({
+      data: {
+        email: dto.email,
+        token,
+        expiresAt,
+      }
+    });
+
+    this.logger.log(`Token de réinitialisation créé pour : ${dto.email}`, 'AuthService');
+
+    // TODO: Envoyer l'email avec le token
+    // Pour l'instant, on log le token (à supprimer en production)
+    this.logger.debug(`Token généré : ${token}`, 'AuthService');
+
+    return { 
+      message: 'Si cet email existe dans notre base de données, un lien de réinitialisation a été envoyé.' 
+    };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    this.logger.log(`Tentative de réinitialisation avec le token : ${dto.token}`, 'AuthService');
+
+    // Vérifier le token
+    const resetRecord = await this.prisma.passwordReset.findUnique({
+      where: { token: dto.token }
+    });
+
+    if (!resetRecord) {
+      this.logger.warn(`Token de réinitialisation invalide : ${dto.token}`, 'AuthService');
+      throw new BadRequestException('Token de réinitialisation invalide ou expiré');
+    }
+
+    if (resetRecord.used) {
+      this.logger.warn(`Token déjà utilisé : ${dto.token}`, 'AuthService');
+      throw new BadRequestException('Ce lien de réinitialisation a déjà été utilisé');
+    }
+
+    if (resetRecord.expiresAt < new Date()) {
+      this.logger.warn(`Token expiré : ${dto.token}`, 'AuthService');
+      throw new BadRequestException('Ce lien de réinitialisation a expiré');
+    }
+
+    // Mettre à jour le mot de passe
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+    await this.prisma.user.update({
+      where: { mail: resetRecord.email },
+      data: { 
+        password: hashedPassword,
+        updated_at: new Date()
+      }
+    });
+
+    // Marquer le token comme utilisé
+    await this.prisma.passwordReset.update({
+      where: { id: resetRecord.id },
+      data: { used: true }
+    });
+
+    this.logger.log(`Mot de passe mis à jour avec succès pour : ${resetRecord.email}`, 'AuthService');
+
+    return { 
+      message: 'Votre mot de passe a été mis à jour avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.' 
     };
   }
 }
