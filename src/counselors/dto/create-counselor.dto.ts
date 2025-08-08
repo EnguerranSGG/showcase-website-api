@@ -29,11 +29,4 @@ export class CreateCounselorDto {
   @Transform(({ value }) => (value ? sanitize(value) : value))
   counselor_function: string;
 
-  @ApiProperty({ example: 'Description d\'un conseiller', required: true })
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(200)
-  @Transform(({ value }) => (value ? sanitize(value) : value))
-  counselor_presentation: string;
-
 }

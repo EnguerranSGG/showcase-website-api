@@ -12,7 +12,6 @@ export class CounselorsService {
         counselor_firstname: dto.counselor_firstname,
         counselor_lastname: dto.counselor_lastname,
         counselor_function: dto.counselor_function,
-        counselor_presentation: dto.counselor_presentation,
         user: { connect: { user_id: userUuid } },
       },
     });
@@ -33,7 +32,6 @@ export class CounselorsService {
         counselor_firstname: dto.counselor_firstname,
         counselor_lastname: dto.counselor_lastname,
         counselor_function: dto.counselor_function,
-        counselor_presentation: dto.counselor_presentation,
         user: { connect: { user_id: userUuid } },
       },
     });

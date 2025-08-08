@@ -63,7 +63,6 @@ model Counselor {
   counselor_firstname      String
   counselor_lastname       String
   counselor_function       String
-  counselor_presentation   String
   user_id                  String
 
   user                    User     @relation(fields: [user_id], references: [user_id])
