@@ -76,8 +76,8 @@ async function main() {
     { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Acquisitions des compétences' }, //28
     { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Auto-évaluations' }, //29
     { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Acquisitions des compétences' }, //30
-    { filename: 'logo_fondation-FACE.png' }, //31
-    { filename: 'logo-uriopss.png' }, //32
+    { filename: 'fnars_hautsdefrance.jpg' }, //31
+    { filename: 'logo_uriopss_hauts-de-france.png' }, //32
   ];
 
   for (const { filename, title } of files) {
@@ -124,13 +124,6 @@ async function main() {
       created_at: now,
       updated_at: now,
       file_id: 13,
-      user_id: admin.user_id,
-    },
-    {
-      name: 'Région Hauts-de-France',
-      created_at: now,
-      updated_at: now,
-      file_id: 14,
       user_id: admin.user_id,
     },
     {
@@ -190,28 +183,24 @@ async function main() {
       counselor_firstname: 'Dieudonné',
       counselor_lastname: 'Mamadou',
       counselor_function: 'Président',
-      counselor_presentation: 'Description d\'un conseiller',
       user_id: admin.user_id,
     },
     {
       counselor_firstname: 'Nathalie',
       counselor_lastname: 'Chantrel',
       counselor_function: 'Directrice',
-      counselor_presentation: 'Description d\'un conseiller',
       user_id: admin.user_id,
     },
     {
       counselor_firstname: 'Coralie',
       counselor_lastname: 'Olivier',
       counselor_function: 'Coordinatrice qualité',
-      counselor_presentation: 'Description d\'un conseiller',
       user_id: admin.user_id,
     },
     {
       counselor_firstname: 'Christiane',
       counselor_lastname: 'Shamshoodeen',
       counselor_function: 'Secrétaire',
-      counselor_presentation: 'Description d\'un conseiller',
       user_id: admin.user_id,
     },
   ];
@@ -470,7 +459,7 @@ async function main() {
       name: 'Siège social',
       description:
         'Le siège social accueil le pôle direction de A.I.R. ainsi que les emplois administratifs.',
-      address: '108 rue Jean Jacques Rousseau, Hellemmes',
+      address: '108 rue Jean Jacques Rousseau, 59260 Hellemmes',
       phone_number: '03 20 04 16 85',
       created_at: now,
       updated_at: now,
