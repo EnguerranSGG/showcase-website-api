@@ -93,7 +93,7 @@ export class PartnersController {
   @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
-  @Get()
+  @Get('all')
   @ApiOperation({ summary: 'Récupérer tous les partenaires' })
   @ApiResponse({
     status: 200,
