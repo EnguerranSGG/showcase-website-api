@@ -1,0 +1,11 @@
+[Unit]
+Description=Run AIR Application Backup daily
+Requires=air-backup.service
+
+[Timer]
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+RandomizedDelaySec=1800
+
+[Install]
+WantedBy=timers.target
