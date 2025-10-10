@@ -12,6 +12,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { LoggerService } from 'src/common/logger/logger.service';
+import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
@@ -22,6 +23,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private logger: LoggerService,
+    private emailService: EmailService,
   ) {}
 
   async addUser(dto: RegisterDto) {
@@ -173,9 +175,19 @@ export class AuthService {
 
     this.logger.log(`Token de réinitialisation créé pour : ${dto.email}`, 'AuthService');
 
-    // TODO: Envoyer l'email avec le token
-    // Pour l'instant, on log le token (à supprimer en production)
-    this.logger.debug(`Token généré : ${token}`, 'AuthService');
+    // Envoyer l'email avec le token
+    const emailSent = await this.emailService.sendPasswordResetEmail(dto.email, token);
+    
+    if (!emailSent) {
+      this.logger.error(`Échec de l'envoi de l'email de réinitialisation à : ${dto.email}`, 'AuthService');
+      // En cas d'échec d'envoi, on supprime le token de la base
+      await this.prisma.passwordReset.delete({
+        where: { token }
+      });
+      throw new BadRequestException('Erreur lors de l\'envoi de l\'email de réinitialisation');
+    }
+
+    this.logger.log(`Email de réinitialisation envoyé avec succès à : ${dto.email}`, 'AuthService');
 
     return { 
       message: 'Si cet email existe dans notre base de données, un lien de réinitialisation a été envoyé.' 

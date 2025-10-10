@@ -10,11 +10,13 @@ import { AccessTokenStrategy } from './stratgies/accessToken.strategy';
 import { RefreshTokenStrategy } from './stratgies/refreshToken.strategy';
 import { LoggerService } from 'src/common/logger/logger.service';
 import { RolesGuard } from './guards/roles.guard';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     ConfigModule,
     PassportModule,
+    EmailModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
