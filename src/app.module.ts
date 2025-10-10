@@ -26,6 +26,7 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import { CounselorsModule } from './counselors/counselors.module';
 import { PresentationsModule } from './presentations/presentations.module';
 import { LastUpdateModule } from './last-update/last-update.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { LastUpdateModule } from './last-update/last-update.module';
     CounselorsModule,
     PresentationsModule,
     LastUpdateModule,
+    EmailModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
