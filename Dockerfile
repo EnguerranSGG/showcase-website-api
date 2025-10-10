@@ -11,7 +11,7 @@ RUN apt-get update \
 
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 ARG ADMIN_EMAIL
 ARG ADMIN_PASSWORD
