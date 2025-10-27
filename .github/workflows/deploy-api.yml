@@ -65,8 +65,16 @@ jobs:
           # Créer le répertoire de déploiement
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p /opt/air"
 
-          # Copier les fichiers API (sans .env.prod)
+          # Diagnostic : Vérifier l'état du répertoire
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "ls -la /opt/air/"
+
+          # Copier les fichiers API (sans .env.prod) avec diagnostic
+          echo "=== Début de la copie des fichiers ==="
           scp -o StrictHostKeyChecking=no -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
+          echo "=== Fin de la copie des fichiers ==="
+
+          # Diagnostic : Vérifier que les fichiers ont été copiés
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "ls -la /opt/air/"
 
           # Créer le fichier .env.prod avec une approche plus simple
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
@@ -88,6 +96,9 @@ jobs:
             echo 'PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr' >> /opt/air/.env.prod
             echo 'API_URL=https://accueil-insertion-rencontre.fr/api' >> /opt/air/.env.prod
           "
+
+          # Diagnostic : Vérifier que le fichier .env.prod a été créé
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo '=== Contenu du fichier .env.prod ===' && cat /opt/air/.env.prod"
 
           # Étape 1 : Arrêter les conteneurs existants
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml down"
