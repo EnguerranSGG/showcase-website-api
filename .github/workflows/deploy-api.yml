@@ -1,0 +1,124 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ===========================================
+  # BUILD API
+  # ===========================================
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build API
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-build
+          path: dist/
+
+  # ===========================================
+  # DÉPLOIEMENT PRODUCTION (main)
+  # ===========================================
+  deploy-production:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: api-build
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Create backup before deployment
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            cd /opt/air &&
+            ./scripts/backup-full.sh pre-deployment-$(date +%Y%m%d-%H%M%S)
+          "
+
+      - name: Deploy API to production
+        run: |
+          # Créer le répertoire de déploiement
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p /opt/air"
+
+          # Copier les fichiers API
+          scp -o StrictHostKeyChecking=no -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
+
+          # Déployer l'API sur production
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            cd /opt/air &&
+            docker compose -f docker-compose.prod.yml down &&
+            docker compose -f docker-compose.prod.yml build --no-cache api db &&
+            docker compose -f docker-compose.prod.yml up -d api db &&
+            sleep 30 &&
+            # Appliquer les migrations existantes
+            docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy &&
+            # Vérifier s'il y a des migrations en attente
+            PENDING_MIGRATIONS=\$(docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate status | grep -c 'not yet applied' || echo '0') &&
+            if [ \"\$PENDING_MIGRATIONS\" -gt 0 ]; then
+              echo 'Migrations en attente détectées, application...' &&
+              docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy
+            else
+              echo 'Toutes les migrations sont à jour'
+            fi &&
+            # Seed uniquement si aucun admin n'est présent
+            ADMIN_COUNT=\$(docker compose -f docker-compose.prod.yml exec -T api npx prisma db execute --stdin <<< 'SELECT COUNT(*) FROM \"User\" WHERE role = \\'ADMIN\\'' | tail -1 | tr -d ' ') &&
+            if [ \"\$ADMIN_COUNT\" -eq 0 ]; then
+              echo 'Aucun admin trouvé, exécution du seed...' &&
+              docker compose -f docker-compose.prod.yml exec -T api npm run seed
+            else
+              echo \"\$ADMIN_COUNT admin(s) trouvé(s), skip du seed\"
+            fi
+          "
+
+      - name: Health check API production
+        run: |
+          sleep 30
+          curl -f https://accueil-insertion-rencontre.fr/api/health || exit 1
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "❌ Échec du déploiement API - Rollback automatique"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            cd /opt/air &&
+            docker compose -f docker-compose.prod.yml down &&
+            LATEST_BACKUP=\$(ls -t /backups/air/pre-deployment-* | head -1) &&
+            if [ -n \"\$LATEST_BACKUP\" ]; then
+              ./scripts/restore-db.sh \$LATEST_BACKUP &&
+              docker compose -f docker-compose.prod.yml up -d api db
+            fi
+          "
