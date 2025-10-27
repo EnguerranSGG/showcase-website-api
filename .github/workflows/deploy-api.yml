@@ -69,7 +69,7 @@ jobs:
             # Créer le script de backup s'il n'existe pas
             if [ ! -f ./scripts/backup-full.sh ]; then
               mkdir -p ./scripts &&
-              cat > ./scripts/backup-full.sh << 'EOF'
+              cat > ./scripts/backup-full.sh << 'BACKUPEOF'
           #!/bin/bash
           BACKUP_DIR=\"/opt/air/backups\"
           TIMESTAMP=\$(date +%Y%m%d-%H%M%S)
@@ -92,7 +92,7 @@ jobs:
           cd \"\${BACKUP_DIR}\"
           ls -t backup-* | tail -n +6 | xargs -r rm -f
           echo \"🎉 Backup terminé avec succès!\"
-          EOF
+          BACKUPEOF
               chmod +x ./scripts/backup-full.sh
             fi &&
             # Exécuter le backup
@@ -110,7 +110,7 @@ jobs:
           # Créer le fichier .env.prod sur le VPS
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            cat > .env.prod << 'EOF'
+            cat > .env.prod << 'ENVEOF'
           DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db
           JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
           JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
@@ -129,7 +129,7 @@ jobs:
           PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api
           PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr
           API_URL=https://accueil-insertion-rencontre.fr/api
-          EOF
+          ENVEOF
           "
 
           # Déployer l'API sur production
