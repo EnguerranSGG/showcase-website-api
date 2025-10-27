@@ -87,21 +87,32 @@ jobs:
           # Copier les fichiers API
           scp -o StrictHostKeyChecking=no -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
 
-          # Déployer l'API sur production
+          # Étape 1 : Arrêter les conteneurs existants
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml down"
+
+          # Étape 2 : Builder les images
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml build --no-cache api db"
+
+          # Étape 3 : Démarrer les conteneurs
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml up -d api db"
+
+          # Étape 4 : Attendre et appliquer les migrations
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && sleep 30 && docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy"
+
+          # Étape 5 : Vérifier s'il y a des admins et seed si nécessaire
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml exec -T api npx prisma db execute --stdin <<< \"SELECT COUNT(*) FROM User WHERE role = 'ADMIN'\" | tail -1 | tr -d ' ' > /tmp/admin_count.txt"
+
+          # Étape 6 : Lire le résultat et décider du seed
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            docker compose -f docker-compose.prod.yml down &&
-            docker compose -f docker-compose.prod.yml build --no-cache api db &&
-            docker compose -f docker-compose.prod.yml up -d api db &&
-            sleep 30 &&
-            docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy &&
-            ADMIN_COUNT=\$(docker compose -f docker-compose.prod.yml exec -T api npx prisma db execute --stdin <<< 'SELECT COUNT(*) FROM \"User\" WHERE role = \\'ADMIN\\'' | tail -1 | tr -d ' ') &&
+            ADMIN_COUNT=\$(cat /tmp/admin_count.txt) &&
             if [ \"\$ADMIN_COUNT\" -eq 0 ]; then
               echo 'Aucun admin trouvé, exécution du seed...' &&
               docker compose -f docker-compose.prod.yml exec -T api npm run seed
             else
               echo \"\$ADMIN_COUNT admin(s) trouvé(s), skip du seed\"
-            fi
+            fi &&
+            rm -f /tmp/admin_count.txt
           "
 
       - name: Health check API production
