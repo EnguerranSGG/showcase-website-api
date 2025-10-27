@@ -137,11 +137,11 @@ jobs:
             cd /opt/air &&
             echo '=== Démarrage des conteneurs ===' &&
             docker compose -f docker-compose.prod.yml up -d api db &&
-            sleep 5 &&
+            sleep 10 &&
             echo '=== État des conteneurs ===' &&
             docker compose -f docker-compose.prod.yml ps &&
-            echo '=== Logs du conteneur API (dernières 50 lignes) ===' &&
-            docker compose -f docker-compose.prod.yml logs --tail=50 api &&
+            echo '=== Logs du conteneur API (dernières 100 lignes) ===' &&
+            docker compose -f docker-compose.prod.yml logs --tail=100 api &&
             echo '=== Logs du conteneur DB (dernières 20 lignes) ===' &&
             docker compose -f docker-compose.prod.yml logs --tail=20 db &&
             echo '=== Contenu du fichier .env.prod ===' &&
@@ -150,6 +150,19 @@ jobs:
             docker compose -f docker-compose.prod.yml exec -T db pg_isready -U postgres
           "
           echo "✅ Diagnostic des conteneurs terminé"
+
+          # Étape 9.5 : Diagnostic spécifique de l'API
+          echo "🔍 Étape 9.5 : Diagnostic spécifique de l'API"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            cd /opt/air &&
+            echo '=== État détaillé des conteneurs ===' &&
+            docker compose -f docker-compose.prod.yml ps -a &&
+            echo '=== Logs complets de l\'API ===' &&
+            docker compose -f docker-compose.prod.yml logs api &&
+            echo '=== Vérification des variables d\'environnement dans le conteneur ===' &&
+            docker compose -f docker-compose.prod.yml exec -T api env | grep -E '(DATABASE_URL|JWT_|ADMIN_|NODE_ENV)' || echo 'Conteneur API non accessible'
+          "
+          echo "✅ Diagnostic spécifique de l'API terminé"
 
           # Étape 10 : Attendre et appliquer les migrations
           echo "🗄️ Étape 10 : Application des migrations"
