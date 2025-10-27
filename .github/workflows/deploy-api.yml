@@ -62,26 +62,15 @@ jobs:
 
       - name: Deploy API to production
         run: |
-          # Créer le fichier .env.prod localement
-          cat > .env.prod << 'ENVEOF'
-          DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db
-          JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
-          JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
-          NODE_ENV=production
-          LOG_LEVEL=info
-          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
-          FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr
-          SMTP_HOST=smtp.gmail.com
-          SMTP_PORT=587
-          SMTP_USER=${{ secrets.SMTP_USER }}
-          SMTP_PASS=${{ secrets.SMTP_PASS }}
-          SMTP_FROM=${{ secrets.SMTP_FROM }}
-          FRONTEND_URL=https://accueil-insertion-rencontre.fr
-          PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api
-          PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr
-          API_URL=https://accueil-insertion-rencontre.fr/api
-          ENVEOF
+          # Créer le fichier .env.prod à partir du template
+          sed -e "s/__JWT_ACCESS_SECRET__/${{ secrets.JWT_ACCESS_SECRET }}/g" \
+              -e "s/__JWT_REFRESH_SECRET__/${{ secrets.JWT_REFRESH_SECRET }}/g" \
+              -e "s/__ADMIN_EMAIL__/${{ secrets.ADMIN_EMAIL }}/g" \
+              -e "s/__ADMIN_PASSWORD__/${{ secrets.ADMIN_PASSWORD }}/g" \
+              -e "s/__SMTP_USER__/${{ secrets.SMTP_USER }}/g" \
+              -e "s/__SMTP_PASS__/${{ secrets.SMTP_PASS }}/g" \
+              -e "s/__SMTP_FROM__/${{ secrets.SMTP_FROM }}/g" \
+              env.prod.template > .env.prod
 
           # Créer le répertoire de déploiement
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p /opt/air"
