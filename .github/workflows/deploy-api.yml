@@ -62,15 +62,24 @@ jobs:
 
       - name: Deploy API to production
         run: |
-          # Créer le fichier .env.prod à partir du template
-          sed -e "s/__JWT_ACCESS_SECRET__/${{ secrets.JWT_ACCESS_SECRET }}/g" \
-              -e "s/__JWT_REFRESH_SECRET__/${{ secrets.JWT_REFRESH_SECRET }}/g" \
-              -e "s/__ADMIN_EMAIL__/${{ secrets.ADMIN_EMAIL }}/g" \
-              -e "s/__ADMIN_PASSWORD__/${{ secrets.ADMIN_PASSWORD }}/g" \
-              -e "s/__SMTP_USER__/${{ secrets.SMTP_USER }}/g" \
-              -e "s/__SMTP_PASS__/${{ secrets.SMTP_PASS }}/g" \
-              -e "s/__SMTP_FROM__/${{ secrets.SMTP_FROM }}/g" \
-              env.prod.template > .env.prod
+          # Créer le fichier .env.prod avec printf (évite les problèmes de sed)
+          printf "DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db\n" > .env.prod
+          printf "JWT_ACCESS_SECRET=%s\n" "${{ secrets.JWT_ACCESS_SECRET }}" >> .env.prod
+          printf "JWT_REFRESH_SECRET=%s\n" "${{ secrets.JWT_REFRESH_SECRET }}" >> .env.prod
+          printf "NODE_ENV=production\n" >> .env.prod
+          printf "LOG_LEVEL=info\n" >> .env.prod
+          printf "ADMIN_EMAIL=%s\n" "${{ secrets.ADMIN_EMAIL }}" >> .env.prod
+          printf "ADMIN_PASSWORD=%s\n" "${{ secrets.ADMIN_PASSWORD }}" >> .env.prod
+          printf "FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr\n" >> .env.prod
+          printf "SMTP_HOST=smtp.gmail.com\n" >> .env.prod
+          printf "SMTP_PORT=587\n" >> .env.prod
+          printf "SMTP_USER=%s\n" "${{ secrets.SMTP_USER }}" >> .env.prod
+          printf "SMTP_PASS=%s\n" "${{ secrets.SMTP_PASS }}" >> .env.prod
+          printf "SMTP_FROM=%s\n" "${{ secrets.SMTP_FROM }}" >> .env.prod
+          printf "FRONTEND_URL=https://accueil-insertion-rencontre.fr\n" >> .env.prod
+          printf "PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api\n" >> .env.prod
+          printf "PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr\n" >> .env.prod
+          printf "API_URL=https://accueil-insertion-rencontre.fr/api\n" >> .env.prod
 
           # Créer le répertoire de déploiement
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p /opt/air"
