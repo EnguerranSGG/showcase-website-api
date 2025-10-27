@@ -1,18 +1,55 @@
-# Builder
+# === Build Stage ===
 FROM node:20-slim AS builder
+
 WORKDIR /app
+
+# Installation des dépendances système nécessaires
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copie des fichiers de dépendances
 COPY package*.json ./
-RUN npm install
+
+# Installation des dépendances Node.js
+RUN npm ci
+
+# Copie du reste du code
 COPY . .
+
+# Build du client Prisma avec les binaryTargets
+
 RUN npx prisma generate
+
+# Build de l'application NestJS
 RUN npm run build
 
-# Runner
+
+# === Production Stage ===
 FROM node:20-slim AS runner
+
 WORKDIR /app
+
+# Installer netcat avant de changer d'utilisateur
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends netcat-openbsd openssl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Créer un utilisateur non-root
+RUN addgroup --system app && adduser --system --ingroup app appuser
+
+# Copier les fichiers nécessaires
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-ENV NODE_ENV=production
-CMD ["node", "dist/main"]
+COPY --from=builder /app/prisma/seed-files ./dist/prisma/seed-files
+
+# Changer les droits de propriété
+RUN chown -R appuser:app /app
+USER appuser
+
+ENV PORT=3000
+
+# Attendre que la base de données soit accessible avant de démarrer l'API
+CMD sh -c "until nc -z db 5432; do echo '🕓 Waiting for DB...'; sleep 1; done; node dist/main"

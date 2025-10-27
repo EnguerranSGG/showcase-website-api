@@ -6,7 +6,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
+  binaryTargets = ["native", "linux-musl", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -14,165 +14,247 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model User {
-  user_id    String   @id @default(uuid())
-  firstname  String
-  lastname   String
-  mail       String   @unique
-  password   String
-  created_at DateTime
-  updated_at DateTime
-  partners   Partner[]
-  times      Time[]
-  jobOffers  Job_offer[]
-  structures Structure[]
-  statistics Statistic[]
-  news       News[]
-  values     Value[]
-  jobs       Job[]
-  steps      Step[]
-  files      File[]
+  user_id         String      @id @default(uuid())
+  firstname       String
+  lastname        String
+  mail            String      @unique
+  password        String
+  role            Role        @default(USER)
+  refreshToken    String?
+  created_at      DateTime
+  updated_at      DateTime
+  partners        Partner[]
+  times           Time[]
+  jobOffers       Job_offer[]
+  structures      Structure[]
+  statistics      Statistic[]
+  news            News[]
+  values          Value[]
+  steps           Step[]
+  files           File[]
+  missions        Mission[]
+  counselors      Counselor[]
+  presentations   Presentation[]
+
+  @@map("users")
 }
 
 model Partner {
-  parteners_id Int    @id @default(autoincrement())
+  parteners_id Int      @id @default(autoincrement())
   name         String
-  image_url    String
   created_at   DateTime
   updated_at   DateTime
   user_id      String
-  user         User   @relation(fields: [user_id], references: [user_id])
+  file_id      Int?
+  file         File?    @relation("PartnerToFile", fields: [file_id], references: [file_id])
+  user         User     @relation(fields: [user_id], references: [user_id])
+
+  @@map("partners")
+}
+
+model Counselor {
+  counselor_id            Int      @id @default(autoincrement())
+  counselor_firstname      String
+  counselor_lastname       String
+  counselor_function       String
+  user_id                  String
+
+  user                    User     @relation(fields: [user_id], references: [user_id])
+  @@map("counselors")
+}
+
+model Presentation {
+  presentation_id            Int      @id @default(autoincrement())
+  presentation_text          String
+  user_id                    String
+
+  user                       User     @relation(fields: [user_id], references: [user_id])
+  @@map("presentations")
 }
 
 model Time {
-  time_id           Int    @id @default(autoincrement())
+  time_id           Int      @id @default(autoincrement())
   year              Int
   event_description String
   created_at        DateTime
   updated_at        DateTime
   user_id           String
-  user              User   @relation(fields: [user_id], references: [user_id])
+  user              User     @relation(fields: [user_id], references: [user_id])
+
+  @@map("times")
 }
 
 model Job_offer {
-  job_offer_id Int    @id @default(autoincrement())
+  job_offer_id Int      @id @default(autoincrement())
   name         String
   job_type     String
   city         String?
-  image_url    String?
   link         String?
   description  String
   created_at   DateTime
   updated_at   DateTime
+
+  file_id      Int?
+  file         File?    @relation("JobOfferToFile", fields: [file_id], references: [file_id])
   user_id      String
-  user         User   @relation(fields: [user_id], references: [user_id])
+  user         User     @relation(fields: [user_id], references: [user_id])
+
+  @@map("job_offers")
 }
 
 model Structure {
-  structure_id  Int     @id @default(autoincrement())
-  name          String
-  image_url     String?
-  description   String
-  address       String?
-  phone_number  String?
-  missions      String?
-  link          String?
-  schedule      String?
-  created_at    DateTime
-  updated_at    DateTime
-  user_id       String
-  user          User    @relation(fields: [user_id], references: [user_id])
-}
-
-model Statistic {
-  statistic_id Int    @id @default(autoincrement())
-  label        String
-  value        Int
-  year         Int
+  structure_id Int       @id @default(autoincrement())
+  name         String
+  description  String
+  address      String?
+  phone_number String?
+  link         String?
   created_at   DateTime
   updated_at   DateTime
   user_id      String
-  type_id      Int
-  user         User   @relation(fields: [user_id], references: [user_id])
-  type         Type   @relation(fields: [type_id], references: [type_id])
+  file_id      Int?
+  structure_type_id Int?
+  file         File?    @relation("StructureToFile", fields: [file_id], references: [file_id])
+  structure_type StructureType? @relation(fields: [structure_type_id], references: [structure_type_id])
+  user         User      @relation(fields: [user_id], references: [user_id])
+  missions     Mission[]
+
+  @@map("structures")
+}
+
+model Mission {
+  mission_id   Int       @id @default(autoincrement())
+  content      String    @db.VarChar(250)
+  structure_id Int
+  structure    Structure @relation(fields: [structure_id], references: [structure_id])
+  user_id      String
+  user         User      @relation(fields: [user_id], references: [user_id])
+}
+
+model Statistic {
+  statistic_id   Int      @id @default(autoincrement())
+  label          String
+  value          Decimal  @db.Decimal(10,2)
+  year           Int
+  is_percentage  Boolean  
+  created_at     DateTime
+  updated_at     DateTime
+  user_id        String
+  type_id        Int
+  user           User     @relation(fields: [user_id], references: [user_id])
+  type           Type     @relation(fields: [type_id], references: [type_id])
+
+  @@map("statistics")
 }
 
 model News {
-  news_id     Int     @id @default(autoincrement())
+  news_id     Int      @id @default(autoincrement())
   name        String
-  image_url   String?
   link        String?
   description String
   created_at  DateTime
   updated_at  DateTime
   user_id     String
-  user        User    @relation(fields: [user_id], references: [user_id])
+  file_id      Int?
+  file         File?    @relation("NewsToFile", fields: [file_id], references: [file_id])
+  user        User     @relation(fields: [user_id], references: [user_id])
+
+  @@map("news")
 }
 
 model Value {
-  value_id    Int     @id @default(autoincrement())
-  name        String
-  image_url   String?
-  created_at  DateTime
-  updated_at  DateTime
-  user_id     String
-  user        User    @relation(fields: [user_id], references: [user_id])
-}
+  value_id   Int      @id @default(autoincrement())
+  name       String
+  created_at DateTime
+  updated_at DateTime
+  user_id    String
+  file_id      Int?
+  file         File?    @relation("ValueToFile", fields: [file_id], references: [file_id])
+  user       User     @relation(fields: [user_id], references: [user_id])
 
-model Position {
-  position_id Int     @id @default(autoincrement())
-  name        String
-  created_at  DateTime
-  updated_at  DateTime
-  jobs        Job[]
-}
-
-model Job {
-  job_id      Int     @id @default(autoincrement())
-  function    String
-  created_at  DateTime
-  updated_at  DateTime
-  position_id Int
-  user_id     String
-  position    Position @relation(fields: [position_id], references: [position_id])
-  user        User     @relation(fields: [user_id], references: [user_id])
+  @@map("values")
 }
 
 model Step {
-  step_id     Int     @id @default(autoincrement())
+  step_id     Int      @id @default(autoincrement())
   name        String
-  image_url   String?
   description String
   created_at  DateTime
   updated_at  DateTime
   user_id     String
   path_id     Int
-  user        User    @relation(fields: [user_id], references: [user_id])
-  path        Path    @relation(fields: [path_id], references: [path_id])
+  file_id      Int?
+  file         File?    @relation("StepToFile", fields: [file_id], references: [file_id])
+  user        User     @relation(fields: [user_id], references: [user_id])
+  path        Path     @relation(fields: [path_id], references: [path_id])
+
+  @@map("steps")
 }
 
 model Path {
-  path_id    Int     @id @default(autoincrement())
-  name       String  @unique
+  path_id    Int      @id @default(autoincrement())
+  name       String   @unique
   created_at DateTime
   updated_at DateTime
   steps      Step[]
+
+  @@map("paths")
 }
 
 model File {
-  file_id    Int     @id @default(autoincrement())
+  file_id    Int         @id @default(autoincrement())
   name       String
+  title      String?
   file       Bytes
   created_at DateTime
   updated_at DateTime
   user_id    String
-  user       User    @relation(fields: [user_id], references: [user_id])
+  user       User        @relation(fields: [user_id], references: [user_id])
+  jobOffers  Job_offer[] @relation("JobOfferToFile")
+  structures Structure[] @relation("StructureToFile")
+  steps Step[] @relation("StepToFile")
+  values Value[] @relation("ValueToFile")
+  news News[] @relation("NewsToFile")
+  partners Partner[] @relation("PartnerToFile")
+
+
+  @@map("files")
 }
 
 model Type {
-  type_id    Int     @id @default(autoincrement())
+  type_id    Int         @id @default(autoincrement())
   name       String
   created_at DateTime
   updated_at DateTime
   statistics Statistic[]
+
+  @@map("types")
 }
+
+model StructureType {
+  structure_type_id Int         @id @default(autoincrement())
+  name              String      @unique
+  created_at        DateTime
+  updated_at        DateTime
+  structures        Structure[]
+
+  @@map("structure_types")
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@map("password_resets")
+}
+

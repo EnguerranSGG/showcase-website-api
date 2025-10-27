@@ -1,18 +1,19 @@
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "users" (
     "user_id" TEXT NOT NULL,
     "firstname" TEXT NOT NULL,
     "lastname" TEXT NOT NULL,
     "mail" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "refreshToken" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("user_id")
+    CONSTRAINT "users_pkey" PRIMARY KEY ("user_id")
 );
 
 -- CreateTable
-CREATE TABLE "Partner" (
+CREATE TABLE "partners" (
     "parteners_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "image_url" TEXT NOT NULL,
@@ -20,11 +21,11 @@ CREATE TABLE "Partner" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "user_id" TEXT NOT NULL,
 
-    CONSTRAINT "Partner_pkey" PRIMARY KEY ("parteners_id")
+    CONSTRAINT "partners_pkey" PRIMARY KEY ("parteners_id")
 );
 
 -- CreateTable
-CREATE TABLE "Time" (
+CREATE TABLE "times" (
     "time_id" SERIAL NOT NULL,
     "year" INTEGER NOT NULL,
     "event_description" TEXT NOT NULL,
@@ -32,11 +33,11 @@ CREATE TABLE "Time" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "user_id" TEXT NOT NULL,
 
-    CONSTRAINT "Time_pkey" PRIMARY KEY ("time_id")
+    CONSTRAINT "times_pkey" PRIMARY KEY ("time_id")
 );
 
 -- CreateTable
-CREATE TABLE "Job_offer" (
+CREATE TABLE "job_offers" (
     "job_offer_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "job_type" TEXT NOT NULL,
@@ -48,11 +49,11 @@ CREATE TABLE "Job_offer" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "user_id" TEXT NOT NULL,
 
-    CONSTRAINT "Job_offer_pkey" PRIMARY KEY ("job_offer_id")
+    CONSTRAINT "job_offers_pkey" PRIMARY KEY ("job_offer_id")
 );
 
 -- CreateTable
-CREATE TABLE "Structure" (
+CREATE TABLE "structures" (
     "structure_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "image_url" TEXT,
@@ -66,11 +67,11 @@ CREATE TABLE "Structure" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "user_id" TEXT NOT NULL,
 
-    CONSTRAINT "Structure_pkey" PRIMARY KEY ("structure_id")
+    CONSTRAINT "structures_pkey" PRIMARY KEY ("structure_id")
 );
 
 -- CreateTable
-CREATE TABLE "Statistic" (
+CREATE TABLE "statistics" (
     "statistic_id" SERIAL NOT NULL,
     "label" TEXT NOT NULL,
     "value" INTEGER NOT NULL,
@@ -80,11 +81,11 @@ CREATE TABLE "Statistic" (
     "user_id" TEXT NOT NULL,
     "type_id" INTEGER NOT NULL,
 
-    CONSTRAINT "Statistic_pkey" PRIMARY KEY ("statistic_id")
+    CONSTRAINT "statistics_pkey" PRIMARY KEY ("statistic_id")
 );
 
 -- CreateTable
-CREATE TABLE "News" (
+CREATE TABLE "news" (
     "news_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "image_url" TEXT,
@@ -94,11 +95,11 @@ CREATE TABLE "News" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "user_id" TEXT NOT NULL,
 
-    CONSTRAINT "News_pkey" PRIMARY KEY ("news_id")
+    CONSTRAINT "news_pkey" PRIMARY KEY ("news_id")
 );
 
 -- CreateTable
-CREATE TABLE "Value" (
+CREATE TABLE "values" (
     "value_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "image_url" TEXT,
@@ -106,21 +107,21 @@ CREATE TABLE "Value" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "user_id" TEXT NOT NULL,
 
-    CONSTRAINT "Value_pkey" PRIMARY KEY ("value_id")
+    CONSTRAINT "values_pkey" PRIMARY KEY ("value_id")
 );
 
 -- CreateTable
-CREATE TABLE "Position" (
+CREATE TABLE "positions" (
     "position_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Position_pkey" PRIMARY KEY ("position_id")
+    CONSTRAINT "positions_pkey" PRIMARY KEY ("position_id")
 );
 
 -- CreateTable
-CREATE TABLE "Job" (
+CREATE TABLE "jobs" (
     "job_id" SERIAL NOT NULL,
     "function" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL,
@@ -128,11 +129,11 @@ CREATE TABLE "Job" (
     "position_id" INTEGER NOT NULL,
     "user_id" TEXT NOT NULL,
 
-    CONSTRAINT "Job_pkey" PRIMARY KEY ("job_id")
+    CONSTRAINT "jobs_pkey" PRIMARY KEY ("job_id")
 );
 
 -- CreateTable
-CREATE TABLE "Step" (
+CREATE TABLE "steps" (
     "step_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "image_url" TEXT,
@@ -142,21 +143,21 @@ CREATE TABLE "Step" (
     "user_id" TEXT NOT NULL,
     "path_id" INTEGER NOT NULL,
 
-    CONSTRAINT "Step_pkey" PRIMARY KEY ("step_id")
+    CONSTRAINT "steps_pkey" PRIMARY KEY ("step_id")
 );
 
 -- CreateTable
-CREATE TABLE "Path" (
+CREATE TABLE "paths" (
     "path_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Path_pkey" PRIMARY KEY ("path_id")
+    CONSTRAINT "paths_pkey" PRIMARY KEY ("path_id")
 );
 
 -- CreateTable
-CREATE TABLE "File" (
+CREATE TABLE "files" (
     "file_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "file" BYTEA NOT NULL,
@@ -164,60 +165,60 @@ CREATE TABLE "File" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "user_id" TEXT NOT NULL,
 
-    CONSTRAINT "File_pkey" PRIMARY KEY ("file_id")
+    CONSTRAINT "files_pkey" PRIMARY KEY ("file_id")
 );
 
 -- CreateTable
-CREATE TABLE "Type" (
+CREATE TABLE "types" (
     "type_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Type_pkey" PRIMARY KEY ("type_id")
+    CONSTRAINT "types_pkey" PRIMARY KEY ("type_id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_mail_key" ON "User"("mail");
+CREATE UNIQUE INDEX "users_mail_key" ON "users"("mail");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Path_name_key" ON "Path"("name");
+CREATE UNIQUE INDEX "paths_name_key" ON "paths"("name");
 
 -- AddForeignKey
-ALTER TABLE "Partner" ADD CONSTRAINT "Partner_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "partners" ADD CONSTRAINT "partners_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Time" ADD CONSTRAINT "Time_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "times" ADD CONSTRAINT "times_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Job_offer" ADD CONSTRAINT "Job_offer_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "job_offers" ADD CONSTRAINT "job_offers_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Structure" ADD CONSTRAINT "Structure_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "structures" ADD CONSTRAINT "structures_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Statistic" ADD CONSTRAINT "Statistic_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "statistics" ADD CONSTRAINT "statistics_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Statistic" ADD CONSTRAINT "Statistic_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "Type"("type_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "statistics" ADD CONSTRAINT "statistics_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "types"("type_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "News" ADD CONSTRAINT "News_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "news" ADD CONSTRAINT "news_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Value" ADD CONSTRAINT "Value_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "values" ADD CONSTRAINT "values_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Job" ADD CONSTRAINT "Job_position_id_fkey" FOREIGN KEY ("position_id") REFERENCES "Position"("position_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "jobs" ADD CONSTRAINT "jobs_position_id_fkey" FOREIGN KEY ("position_id") REFERENCES "positions"("position_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Job" ADD CONSTRAINT "Job_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "jobs" ADD CONSTRAINT "jobs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Step" ADD CONSTRAINT "Step_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "steps" ADD CONSTRAINT "steps_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Step" ADD CONSTRAINT "Step_path_id_fkey" FOREIGN KEY ("path_id") REFERENCES "Path"("path_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "steps" ADD CONSTRAINT "steps_path_id_fkey" FOREIGN KEY ("path_id") REFERENCES "paths"("path_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "File" ADD CONSTRAINT "File_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "files" ADD CONSTRAINT "files_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;

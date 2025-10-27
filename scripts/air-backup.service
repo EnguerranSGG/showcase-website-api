@@ -1,0 +1,18 @@
+[Unit]
+Description=AIR Application Backup Service
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/air-app
+ExecStart=/opt/air-app/scripts/backup-full.sh
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=0
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
