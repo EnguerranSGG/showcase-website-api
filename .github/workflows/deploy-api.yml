@@ -113,12 +113,12 @@ jobs:
             docker compose -f docker-compose.prod.yml build --no-cache api db
           "
 
-          # Étape 3 : Démarrer les conteneurs
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml up -d api db"
-
-          # Étape 3.5 : Vérifier les logs du conteneur API pour diagnostiquer
+          # Étape 3 : Démarrer les conteneurs avec diagnostic immédiat
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
+            echo '=== Démarrage des conteneurs ===' &&
+            docker compose -f docker-compose.prod.yml up -d api db &&
+            sleep 5 &&
             echo '=== État des conteneurs ===' &&
             docker compose -f docker-compose.prod.yml ps &&
             echo '=== Logs du conteneur API (dernières 50 lignes) ===' &&
