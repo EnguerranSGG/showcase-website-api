@@ -106,7 +106,17 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml up -d api db"
 
           # Étape 3.5 : Vérifier les logs du conteneur API pour diagnostiquer
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && echo '=== Logs du conteneur API ===' && docker compose -f docker-compose.prod.yml logs api"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            cd /opt/air &&
+            echo '=== Logs du conteneur API ===' &&
+            docker compose -f docker-compose.prod.yml logs api &&
+            echo '=== État des conteneurs ===' &&
+            docker compose -f docker-compose.prod.yml ps &&
+            echo '=== Contenu du fichier .env.prod ===' &&
+            cat .env.prod &&
+            echo '=== Test de connexion à la base de données ===' &&
+            docker compose -f docker-compose.prod.yml exec -T db pg_isready -U postgres
+          "
 
           # Étape 4 : Attendre et appliquer les migrations
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && sleep 30 && docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy"
