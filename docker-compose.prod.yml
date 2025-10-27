@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: air-admin
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: air-admin-password
-      POSTGRES_DB: air-db
+      POSTGRES_DB: air_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -33,7 +33,7 @@ services:
   nginx:
     image: nginx:1.28
     ports:
-      - "80:80"
+      - '80:80'
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:

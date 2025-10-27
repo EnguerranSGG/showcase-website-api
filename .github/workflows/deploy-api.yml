@@ -81,7 +81,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
             cat > .env.prod << 'EOF'
-          DATABASE_URL=postgres://air-admin:air-admin-password@db:5432/air-db
+          DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db
           JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
           JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
           NODE_ENV=production
@@ -89,7 +89,7 @@ jobs:
           ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
           FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr
-          SMTP_HOST=gmail
+          SMTP_HOST=smtp.gmail.com
           SMTP_PORT=587
           SMTP_USER=${{ secrets.SMTP_USER }}
           SMTP_PASS=${{ secrets.SMTP_PASS }}
