@@ -90,8 +90,15 @@ jobs:
           # Étape 1 : Arrêter les conteneurs existants
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml down"
 
-          # Étape 2 : Builder les images
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml build --no-cache api db"
+          # Étape 2 : Builder les images avec les variables d'environnement
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            cd /opt/air &&
+            export ADMIN_EMAIL='${{ secrets.ADMIN_EMAIL }}' &&
+            export ADMIN_PASSWORD='${{ secrets.ADMIN_PASSWORD }}' &&
+            export JWT_ACCESS_SECRET='${{ secrets.JWT_ACCESS_SECRET }}' &&
+            export JWT_REFRESH_SECRET='${{ secrets.JWT_REFRESH_SECRET }}' &&
+            docker compose -f docker-compose.prod.yml build --no-cache api db
+          "
 
           # Étape 3 : Démarrer les conteneurs
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml up -d api db"
