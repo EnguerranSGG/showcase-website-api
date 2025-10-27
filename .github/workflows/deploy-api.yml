@@ -64,12 +64,14 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
+            # Nettoyer les anciens scripts de backup
+            rm -f ./scripts/backup-full.sh 2>/dev/null || true &&
+            rm -rf ./backups 2>/dev/null || true &&
             # Créer le répertoire de backup local
             mkdir -p ./backups &&
-            # Créer le script de backup s'il n'existe pas
-            if [ ! -f ./scripts/backup-full.sh ]; then
-              mkdir -p ./scripts &&
-              cat > ./scripts/backup-full.sh << 'BACKUPEOF'
+            # Créer le script de backup propre
+            mkdir -p ./scripts &&
+            cat > ./scripts/backup-full.sh << 'BACKUPEOF'
           #!/bin/bash
           BACKUP_DIR=\"/opt/air/backups\"
           TIMESTAMP=\$(date +%Y%m%d-%H%M%S)
@@ -93,8 +95,7 @@ jobs:
           ls -t backup-* | tail -n +6 | xargs -r rm -f
           echo \"🎉 Backup terminé avec succès!\"
           BACKUPEOF
-              chmod +x ./scripts/backup-full.sh
-            fi &&
+            chmod +x ./scripts/backup-full.sh &&
             # Exécuter le backup
             ./scripts/backup-full.sh
           "
