@@ -60,46 +60,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Create backup before deployment
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            cd /opt/air &&
-            # Nettoyer les anciens scripts de backup
-            rm -f ./scripts/backup-full.sh 2>/dev/null || true &&
-            rm -rf ./backups 2>/dev/null || true &&
-            # Créer le répertoire de backup local
-            mkdir -p ./backups &&
-            # Créer le script de backup propre
-            mkdir -p ./scripts &&
-            cat > ./scripts/backup-full.sh << 'BACKUPEOF'
-          #!/bin/bash
-          BACKUP_DIR=\"/opt/air/backups\"
-          TIMESTAMP=\$(date +%Y%m%d-%H%M%S)
-          BACKUP_NAME=\"backup-\${TIMESTAMP}\"
-          echo \"🔄 Début du backup: \${BACKUP_NAME}\"
-          mkdir -p \"\${BACKUP_DIR}\"
-          if docker compose -f docker-compose.prod.yml ps db | grep -q \"Up\"; then
-            echo \"📦 Backup de la base de données...\"
-            docker compose -f docker-compose.prod.yml exec -T db pg_dump -U postgres air_db > \"\${BACKUP_DIR}/\${BACKUP_NAME}-db.sql\"
-            echo \"✅ Backup DB terminé: \${BACKUP_DIR}/\${BACKUP_NAME}-db.sql\"
-          else
-            echo \"⚠️  Base de données non démarrée, skip du backup DB\"
-          fi
-          echo \"📦 Backup des volumes Docker...\"
-          docker run --rm -v postgres_data:/data -v \"\${BACKUP_DIR}:/backup\" alpine tar czf \"/backup/\${BACKUP_NAME}-volumes.tar.gz\" -C /data .
-          echo \"📦 Backup des fichiers de configuration...\"
-          tar czf \"\${BACKUP_DIR}/\${BACKUP_NAME}-config.tar.gz\" -C /opt/air .
-          echo \"✅ Backup complet terminé: \${BACKUP_NAME}\"
-          ls -la \"\${BACKUP_DIR}/\${BACKUP_NAME}\"*
-          cd \"\${BACKUP_DIR}\"
-          ls -t backup-* | tail -n +6 | xargs -r rm -f
-          echo \"🎉 Backup terminé avec succès!\"
-          BACKUPEOF
-            chmod +x ./scripts/backup-full.sh &&
-            # Exécuter le backup
-            ./scripts/backup-full.sh
-          "
-
       - name: Deploy API to production
         run: |
           # Créer le répertoire de déploiement
@@ -111,26 +71,23 @@ jobs:
           # Créer le fichier .env.prod sur le VPS
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            cat > .env.prod << 'ENVEOF'
-          DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db
-          JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
-          JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
-          NODE_ENV=production
-          LOG_LEVEL=info
-          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
-          FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr
-          SMTP_HOST=smtp.gmail.com
-          SMTP_PORT=587
-          SMTP_USER=${{ secrets.SMTP_USER }}
-          SMTP_PASS=${{ secrets.SMTP_PASS }}
-          SMTP_FROM=${{ secrets.SMTP_FROM }}
-          FRONTEND_URL=https://accueil-insertion-rencontre.fr
-          FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr
-          PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api
-          PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr
-          API_URL=https://accueil-insertion-rencontre.fr/api
-          ENVEOF
+            echo 'DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db' > .env.prod &&
+            echo 'JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}' >> .env.prod &&
+            echo 'JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}' >> .env.prod &&
+            echo 'NODE_ENV=production' >> .env.prod &&
+            echo 'LOG_LEVEL=info' >> .env.prod &&
+            echo 'ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}' >> .env.prod &&
+            echo 'ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}' >> .env.prod &&
+            echo 'FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr' >> .env.prod &&
+            echo 'SMTP_HOST=smtp.gmail.com' >> .env.prod &&
+            echo 'SMTP_PORT=587' >> .env.prod &&
+            echo 'SMTP_USER=${{ secrets.SMTP_USER }}' >> .env.prod &&
+            echo 'SMTP_PASS=${{ secrets.SMTP_PASS }}' >> .env.prod &&
+            echo 'SMTP_FROM=${{ secrets.SMTP_FROM }}' >> .env.prod &&
+            echo 'FRONTEND_URL=https://accueil-insertion-rencontre.fr' >> .env.prod &&
+            echo 'PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api' >> .env.prod &&
+            echo 'PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr' >> .env.prod &&
+            echo 'API_URL=https://accueil-insertion-rencontre.fr/api' >> .env.prod
           "
 
           # Déployer l'API sur production
@@ -140,17 +97,7 @@ jobs:
             docker compose -f docker-compose.prod.yml build --no-cache api db &&
             docker compose -f docker-compose.prod.yml up -d api db &&
             sleep 30 &&
-            # Appliquer les migrations existantes
             docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy &&
-            # Vérifier s'il y a des migrations en attente
-            PENDING_MIGRATIONS=\$(docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate status | grep -c 'not yet applied' || echo '0') &&
-            if [ \"\$PENDING_MIGRATIONS\" -gt 0 ]; then
-              echo 'Migrations en attente détectées, application...' &&
-              docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy
-            else
-              echo 'Toutes les migrations sont à jour'
-            fi &&
-            # Seed uniquement si aucun admin n'est présent
             ADMIN_COUNT=\$(docker compose -f docker-compose.prod.yml exec -T api npx prisma db execute --stdin <<< 'SELECT COUNT(*) FROM \"User\" WHERE role = \\'ADMIN\\'' | tail -1 | tr -d ' ') &&
             if [ \"\$ADMIN_COUNT\" -eq 0 ]; then
               echo 'Aucun admin trouvé, exécution du seed...' &&
