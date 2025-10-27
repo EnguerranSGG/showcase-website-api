@@ -69,27 +69,27 @@ jobs:
           scp -o StrictHostKeyChecking=no -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
 
           # Créer le fichier .env.prod avec échappement des caractères spéciaux
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            cat > /opt/air/.env.prod << 'ENVEOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} '
+            cat > /opt/air/.env.prod << "ENVEOF"
 DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db
-JWT_ACCESS_SECRET=\"${{ secrets.JWT_ACCESS_SECRET }}\"
-JWT_REFRESH_SECRET=\"${{ secrets.JWT_REFRESH_SECRET }}\"
+JWT_ACCESS_SECRET="${{ secrets.JWT_ACCESS_SECRET }}"
+JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}"
 NODE_ENV=production
 LOG_LEVEL=info
-ADMIN_EMAIL=\"${{ secrets.ADMIN_EMAIL }}\"
-ADMIN_PASSWORD=\"${{ secrets.ADMIN_PASSWORD }}\"
+ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}"
+ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}"
 FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=\"${{ secrets.SMTP_USER }}\"
-SMTP_PASS=\"${{ secrets.SMTP_PASS }}\"
-SMTP_FROM=\"${{ secrets.SMTP_FROM }}\"
+SMTP_USER="${{ secrets.SMTP_USER }}"
+SMTP_PASS="${{ secrets.SMTP_PASS }}"
+SMTP_FROM="${{ secrets.SMTP_FROM }}"
 FRONTEND_URL=https://accueil-insertion-rencontre.fr
 PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api
 PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr
 API_URL=https://accueil-insertion-rencontre.fr/api
 ENVEOF
-          "
+          '
 
           # Étape 1 : Arrêter les conteneurs existants
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml down"
