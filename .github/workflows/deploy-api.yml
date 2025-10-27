@@ -64,7 +64,39 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            ./scripts/backup-full.sh pre-deployment-$(date +%Y%m%d-%H%M%S)
+            # Créer le répertoire de backup
+            mkdir -p /backups/air &&
+            # Créer le script de backup s'il n'existe pas
+            if [ ! -f ./scripts/backup-full.sh ]; then
+              mkdir -p ./scripts &&
+              cat > ./scripts/backup-full.sh << 'EOF'
+          #!/bin/bash
+          BACKUP_DIR=\"/backups/air\"
+          TIMESTAMP=\$(date +%Y%m%d-%H%M%S)
+          BACKUP_NAME=\"backup-\${TIMESTAMP}\"
+          echo \"🔄 Début du backup: \${BACKUP_NAME}\"
+          mkdir -p \"\${BACKUP_DIR}\"
+          if docker compose -f docker-compose.prod.yml ps db | grep -q \"Up\"; then
+            echo \"📦 Backup de la base de données...\"
+            docker compose -f docker-compose.prod.yml exec -T db pg_dump -U postgres air_db > \"\${BACKUP_DIR}/\${BACKUP_NAME}-db.sql\"
+            echo \"✅ Backup DB terminé: \${BACKUP_DIR}/\${BACKUP_NAME}-db.sql\"
+          else
+            echo \"⚠️  Base de données non démarrée, skip du backup DB\"
+          fi
+          echo \"📦 Backup des volumes Docker...\"
+          docker run --rm -v postgres_data:/data -v \"\${BACKUP_DIR}:/backup\" alpine tar czf \"/backup/\${BACKUP_NAME}-volumes.tar.gz\" -C /data .
+          echo \"📦 Backup des fichiers de configuration...\"
+          tar czf \"\${BACKUP_DIR}/\${BACKUP_NAME}-config.tar.gz\" -C /opt/air .
+          echo \"✅ Backup complet terminé: \${BACKUP_NAME}\"
+          ls -la \"\${BACKUP_DIR}/\${BACKUP_NAME}\"*
+          cd \"\${BACKUP_DIR}\"
+          ls -t backup-* | tail -n +6 | xargs -r rm -f
+          echo \"🎉 Backup terminé avec succès!\"
+          EOF
+              chmod +x ./scripts/backup-full.sh
+            fi &&
+            # Exécuter le backup
+            ./scripts/backup-full.sh
           "
 
       - name: Deploy API to production
