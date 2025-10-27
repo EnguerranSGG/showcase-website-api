@@ -1,7 +1,5 @@
 services:
-
   astro-site:
-    env_file: .env.prod
     build:
       context: ../front-air/astro-site
       dockerfile: Dockerfile.prod
@@ -19,7 +17,6 @@ services:
     restart: unless-stopped
 
   admin-dashboard:
-    env_file: .env.prod
     build:
       context: ../front-air/admin-dashboard
       dockerfile: Dockerfile.prod
@@ -38,10 +35,11 @@ services:
   nginx:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro  
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - /var/www/certbot:/var/www/certbot:ro
     ports:
-      - "80:80"
-      - "443:443"  
+      - '80:80'
+      - '443:443'
     depends_on:
       - api
       - astro-site
@@ -51,7 +49,7 @@ services:
   api:
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -60,7 +58,7 @@ services:
   db:
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U air-admin -d air-db"]
+      test: ['CMD-SHELL', 'pg_isready -U air-admin -d air-db']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -69,7 +67,7 @@ services:
       POSTGRES_USER: air-admin
       POSTGRES_PASSWORD: air-admin-password
       POSTGRES_DB: air-db
-      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+      POSTGRES_INITDB_ARGS: '--encoding=UTF-8 --lc-collate=C --lc-ctype=C'
 
 volumes:
   postgres_data:
@@ -82,4 +80,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16 
+        - subnet: 172.20.0.0/16
