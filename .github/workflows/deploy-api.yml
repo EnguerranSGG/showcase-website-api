@@ -62,21 +62,32 @@ jobs:
 
       - name: Deploy API to production
         run: |
-          # Créer le répertoire de déploiement
+          echo "🚀 === DÉBUT DU DÉPLOIEMENT API ==="
+
+          # Étape 1 : Créer le répertoire de déploiement
+          echo "📁 Étape 1 : Création du répertoire de déploiement"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p /opt/air"
+          echo "✅ Répertoire créé"
 
-          # Diagnostic : Vérifier l'état du répertoire
+          # Étape 2 : Diagnostic initial
+          echo "🔍 Étape 2 : Diagnostic initial du répertoire"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "ls -la /opt/air/"
+          echo "✅ Diagnostic initial terminé"
 
-          # Copier les fichiers API (sans .env.prod) avec diagnostic
+          # Étape 3 : Copier les fichiers API
+          echo "📋 Étape 3 : Copie des fichiers API"
           echo "=== Début de la copie des fichiers ==="
           scp -o StrictHostKeyChecking=no -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
           echo "=== Fin de la copie des fichiers ==="
+          echo "✅ Fichiers copiés"
 
-          # Diagnostic : Vérifier que les fichiers ont été copiés
+          # Étape 4 : Vérifier la copie
+          echo "🔍 Étape 4 : Vérification de la copie"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "ls -la /opt/air/"
+          echo "✅ Vérification terminée"
 
-          # Créer le fichier .env.prod avec une approche plus simple
+          # Étape 5 : Créer le fichier .env.prod
+          echo "⚙️ Étape 5 : Création du fichier .env.prod"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             echo 'DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db' > /opt/air/.env.prod
             echo 'JWT_ACCESS_SECRET=\"${{ secrets.JWT_ACCESS_SECRET }}\"' >> /opt/air/.env.prod
@@ -96,14 +107,20 @@ jobs:
             echo 'PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr' >> /opt/air/.env.prod
             echo 'API_URL=https://accueil-insertion-rencontre.fr/api' >> /opt/air/.env.prod
           "
+          echo "✅ Fichier .env.prod créé"
 
-          # Diagnostic : Vérifier que le fichier .env.prod a été créé
+          # Étape 6 : Vérifier le fichier .env.prod
+          echo "🔍 Étape 6 : Vérification du fichier .env.prod"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo '=== Contenu du fichier .env.prod ===' && cat /opt/air/.env.prod"
+          echo "✅ Vérification .env.prod terminée"
 
-          # Étape 1 : Arrêter les conteneurs existants
+          # Étape 7 : Arrêter les conteneurs existants
+          echo "🛑 Étape 7 : Arrêt des conteneurs existants"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml down"
+          echo "✅ Conteneurs arrêtés"
 
-          # Étape 2 : Builder les images avec les variables d'environnement
+          # Étape 8 : Builder les images avec les variables d'environnement
+          echo "🔨 Étape 8 : Build des images Docker"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
             export ADMIN_EMAIL='${{ secrets.ADMIN_EMAIL }}' &&
@@ -112,8 +129,10 @@ jobs:
             export JWT_REFRESH_SECRET='${{ secrets.JWT_REFRESH_SECRET }}' &&
             docker compose -f docker-compose.prod.yml build --no-cache api db
           "
+          echo "✅ Images Docker buildées"
 
-          # Étape 3 : Démarrer les conteneurs avec diagnostic immédiat
+          # Étape 9 : Démarrer les conteneurs avec diagnostic immédiat
+          echo "🚀 Étape 9 : Démarrage des conteneurs avec diagnostic"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
             echo '=== Démarrage des conteneurs ===' &&
@@ -130,14 +149,19 @@ jobs:
             echo '=== Test de connexion à la base de données ===' &&
             docker compose -f docker-compose.prod.yml exec -T db pg_isready -U postgres
           "
+          echo "✅ Diagnostic des conteneurs terminé"
 
-          # Étape 4 : Attendre et appliquer les migrations
+          # Étape 10 : Attendre et appliquer les migrations
+          echo "🗄️ Étape 10 : Application des migrations"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && sleep 30 && docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy"
+          echo "✅ Migrations appliquées"
 
-          # Étape 5 : Vérifier s'il y a des admins et seed si nécessaire
+          # Étape 11 : Vérifier s'il y a des admins et seed si nécessaire
+          echo "👤 Étape 11 : Vérification des admins et seed conditionnel"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml exec -T api npx prisma db execute --stdin <<< \"SELECT COUNT(*) FROM User WHERE role = 'ADMIN'\" | tail -1 | tr -d ' ' > /tmp/admin_count.txt"
 
-          # Étape 6 : Lire le résultat et décider du seed
+          # Étape 12 : Lire le résultat et décider du seed
+          echo "🌱 Étape 12 : Exécution conditionnelle du seed"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
             ADMIN_COUNT=\$(cat /tmp/admin_count.txt) &&
@@ -149,22 +173,13 @@ jobs:
             fi &&
             rm -f /tmp/admin_count.txt
           "
+          echo "✅ Seed conditionnel terminé"
+
+          echo "🎉 === DÉPLOIEMENT API TERMINÉ AVEC SUCCÈS ==="
 
       - name: Health check API production
         run: |
+          echo "🏥 Vérification de la santé de l'API"
           sleep 30
           curl -f https://accueil-insertion-rencontre.fr/api/health || exit 1
-
-      - name: Rollback on failure
-        if: failure()
-        run: |
-          echo "❌ Échec du déploiement API - Rollback automatique"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            cd /opt/air &&
-            docker compose -f docker-compose.prod.yml down &&
-            LATEST_BACKUP=\$(ls -t /backups/air/pre-deployment-* | head -1) &&
-            if [ -n \"\$LATEST_BACKUP\" ]; then
-              ./scripts/restore-db.sh \$LATEST_BACKUP &&
-              docker compose -f docker-compose.prod.yml up -d api db
-            fi
-          "
+          echo "✅ API en bonne santé"
