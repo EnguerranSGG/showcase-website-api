@@ -119,10 +119,12 @@ jobs:
           # Étape 3.5 : Vérifier les logs du conteneur API pour diagnostiquer
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            echo '=== Logs du conteneur API ===' &&
-            docker compose -f docker-compose.prod.yml logs api &&
             echo '=== État des conteneurs ===' &&
             docker compose -f docker-compose.prod.yml ps &&
+            echo '=== Logs du conteneur API (dernières 50 lignes) ===' &&
+            docker compose -f docker-compose.prod.yml logs --tail=50 api &&
+            echo '=== Logs du conteneur DB (dernières 20 lignes) ===' &&
+            docker compose -f docker-compose.prod.yml logs --tail=20 db &&
             echo '=== Contenu du fichier .env.prod ===' &&
             cat .env.prod &&
             echo '=== Test de connexion à la base de données ===' &&
