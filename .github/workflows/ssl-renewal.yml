@@ -1,0 +1,64 @@
+name: SSL Certificate Renewal
+
+on:
+  schedule:
+    # Vérifier le renouvellement SSL tous les jours à 2h du matin
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Permet de déclencher manuellement
+
+jobs:
+  check-and-renew-ssl:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
+
+      - name: Check SSL certificate expiry
+        run: |
+          EXPIRY_DATE=$(ssh -o StrictHostKeyChecking=no ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
+            openssl x509 -in /etc/letsencrypt/live/accueil-insertion-rencontre.fr/cert.pem -noout -dates | grep notAfter | cut -d= -f2
+          ")
+
+          EXPIRY_TIMESTAMP=$(date -d "$EXPIRY_DATE" +%s)
+          CURRENT_TIMESTAMP=$(date +%s)
+          DAYS_UNTIL_EXPIRY=$(( (EXPIRY_TIMESTAMP - CURRENT_TIMESTAMP) / 86400 ))
+
+          echo "Certificate expires in $DAYS_UNTIL_EXPIRY days"
+          echo "DAYS_UNTIL_EXPIRY=$DAYS_UNTIL_EXPIRY" >> $GITHUB_ENV
+
+      - name: Renew SSL certificate if needed
+        if: env.DAYS_UNTIL_EXPIRY < 30
+        run: |
+          echo "🔄 SSL certificate expires in less than 30 days, renewing..."
+
+          ssh -o StrictHostKeyChecking=no ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
+            cd /opt/air &&
+            ./scripts/renew-ssl.sh
+          "
+
+      - name: Skip renewal if not needed
+        if: env.DAYS_UNTIL_EXPIRY >= 30
+        run: |
+          echo "✅ SSL certificate is still valid for ${{ env.DAYS_UNTIL_EXPIRY }} days, no renewal needed"
+
+      - name: Verify SSL after renewal
+        if: env.DAYS_UNTIL_EXPIRY < 30
+        run: |
+          sleep 10
+          curl -f https://accueil-insertion-rencontre.fr/health || exit 1
+          echo "✅ SSL certificate renewed and verified successfully"
+
+      - name: Notify SSL status
+        run: |
+          if [ "${{ env.DAYS_UNTIL_EXPIRY }}" -lt 30 ]; then
+            echo "🔄 SSL certificate renewed successfully"
+          else
+            echo "✅ SSL certificate is valid for ${{ env.DAYS_UNTIL_EXPIRY }} more days"
+          fi
