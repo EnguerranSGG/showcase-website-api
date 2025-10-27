@@ -157,10 +157,16 @@ jobs:
             cd /opt/air &&
             echo '=== État détaillé des conteneurs ===' &&
             docker compose -f docker-compose.prod.yml ps -a &&
-            echo '=== Logs complets de l API ===' &&
-            docker compose -f docker-compose.prod.yml logs api &&
-            echo '=== Vérification des variables d environnement dans le conteneur ===' &&
-            docker compose -f docker-compose.prod.yml exec -T api env | grep -E 'DATABASE_URL|JWT_|ADMIN_|NODE_ENV' || echo 'Conteneur API non accessible'
+            echo '=== Logs complets de l API (même si arrêté) ===' &&
+            docker compose -f docker-compose.prod.yml logs --no-log-prefix api &&
+            echo '=== Logs du conteneur air-api-1 directement ===' &&
+            docker logs air-api-1 2>&1 || echo 'Conteneur air-api-1 non trouvé' &&
+            echo '=== Redémarrage de l API pour voir les logs en temps réel ===' &&
+            docker compose -f docker-compose.prod.yml up api &
+            sleep 10 &&
+            echo '=== Logs pendant le démarrage ===' &&
+            docker compose -f docker-compose.prod.yml logs --tail=50 api &&
+            docker compose -f docker-compose.prod.yml stop api
           "
           echo "✅ Diagnostic spécifique de l'API terminé"
 
