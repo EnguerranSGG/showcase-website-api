@@ -68,25 +68,25 @@ jobs:
           # Copier les fichiers API (sans .env.prod)
           scp -o StrictHostKeyChecking=no -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
 
-          # Créer le fichier .env.prod avec printf pour éviter les problèmes de syntaxe
+          # Créer le fichier .env.prod avec une approche plus simple
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            printf 'DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db\n' > /opt/air/.env.prod &&
-            printf 'JWT_ACCESS_SECRET=\"%s\"\n' '${{ secrets.JWT_ACCESS_SECRET }}' >> /opt/air/.env.prod &&
-            printf 'JWT_REFRESH_SECRET=\"%s\"\n' '${{ secrets.JWT_REFRESH_SECRET }}' >> /opt/air/.env.prod &&
-            printf 'NODE_ENV=production\n' >> /opt/air/.env.prod &&
-            printf 'LOG_LEVEL=info\n' >> /opt/air/.env.prod &&
-            printf 'ADMIN_EMAIL=\"%s\"\n' '${{ secrets.ADMIN_EMAIL }}' >> /opt/air/.env.prod &&
-            printf 'ADMIN_PASSWORD=\"%s\"\n' '${{ secrets.ADMIN_PASSWORD }}' >> /opt/air/.env.prod &&
-            printf 'FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr\n' >> /opt/air/.env.prod &&
-            printf 'SMTP_HOST=smtp.gmail.com\n' >> /opt/air/.env.prod &&
-            printf 'SMTP_PORT=587\n' >> /opt/air/.env.prod &&
-            printf 'SMTP_USER=\"%s\"\n' '${{ secrets.SMTP_USER }}' >> /opt/air/.env.prod &&
-            printf 'SMTP_PASS=\"%s\"\n' '${{ secrets.SMTP_PASS }}' >> /opt/air/.env.prod &&
-            printf 'SMTP_FROM=\"%s\"\n' '${{ secrets.SMTP_FROM }}' >> /opt/air/.env.prod &&
-            printf 'FRONTEND_URL=https://accueil-insertion-rencontre.fr\n' >> /opt/air/.env.prod &&
-            printf 'PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api\n' >> /opt/air/.env.prod &&
-            printf 'PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr\n' >> /opt/air/.env.prod &&
-            printf 'API_URL=https://accueil-insertion-rencontre.fr/api\n' >> /opt/air/.env.prod
+            echo 'DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db' > /opt/air/.env.prod
+            echo 'JWT_ACCESS_SECRET=\"${{ secrets.JWT_ACCESS_SECRET }}\"' >> /opt/air/.env.prod
+            echo 'JWT_REFRESH_SECRET=\"${{ secrets.JWT_REFRESH_SECRET }}\"' >> /opt/air/.env.prod
+            echo 'NODE_ENV=production' >> /opt/air/.env.prod
+            echo 'LOG_LEVEL=info' >> /opt/air/.env.prod
+            echo 'ADMIN_EMAIL=\"${{ secrets.ADMIN_EMAIL }}\"' >> /opt/air/.env.prod
+            echo 'ADMIN_PASSWORD=\"${{ secrets.ADMIN_PASSWORD }}\"' >> /opt/air/.env.prod
+            echo 'FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr' >> /opt/air/.env.prod
+            echo 'SMTP_HOST=smtp.gmail.com' >> /opt/air/.env.prod
+            echo 'SMTP_PORT=587' >> /opt/air/.env.prod
+            echo 'SMTP_USER=\"${{ secrets.SMTP_USER }}\"' >> /opt/air/.env.prod
+            echo 'SMTP_PASS=\"${{ secrets.SMTP_PASS }}\"' >> /opt/air/.env.prod
+            echo 'SMTP_FROM=\"${{ secrets.SMTP_FROM }}\"' >> /opt/air/.env.prod
+            echo 'FRONTEND_URL=https://accueil-insertion-rencontre.fr' >> /opt/air/.env.prod
+            echo 'PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api' >> /opt/air/.env.prod
+            echo 'PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr' >> /opt/air/.env.prod
+            echo 'API_URL=https://accueil-insertion-rencontre.fr/api' >> /opt/air/.env.prod
           "
 
           # Étape 1 : Arrêter les conteneurs existants
