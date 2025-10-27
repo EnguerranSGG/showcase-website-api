@@ -12,7 +12,7 @@ RUN apt-get update \
 COPY package*.json ./
 
 # Installation des dépendances Node.js
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copie du reste du code
 COPY . .
