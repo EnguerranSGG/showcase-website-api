@@ -68,26 +68,28 @@ jobs:
           # Copier les fichiers API
           scp -o StrictHostKeyChecking=no -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
 
-          # Créer le fichier .env.prod sur le VPS
+          # Créer le fichier .env.prod sur le VPS avec une approche simple
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            echo 'DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db' > .env.prod &&
-            echo 'JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}' >> .env.prod &&
-            echo 'JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}' >> .env.prod &&
-            echo 'NODE_ENV=production' >> .env.prod &&
-            echo 'LOG_LEVEL=info' >> .env.prod &&
-            echo 'ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}' >> .env.prod &&
-            echo 'ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}' >> .env.prod &&
-            echo 'FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr' >> .env.prod &&
-            echo 'SMTP_HOST=smtp.gmail.com' >> .env.prod &&
-            echo 'SMTP_PORT=587' >> .env.prod &&
-            echo 'SMTP_USER=${{ secrets.SMTP_USER }}' >> .env.prod &&
-            echo 'SMTP_PASS=${{ secrets.SMTP_PASS }}' >> .env.prod &&
-            echo 'SMTP_FROM=${{ secrets.SMTP_FROM }}' >> .env.prod &&
-            echo 'FRONTEND_URL=https://accueil-insertion-rencontre.fr' >> .env.prod &&
-            echo 'PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api' >> .env.prod &&
-            echo 'PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr' >> .env.prod &&
-            echo 'API_URL=https://accueil-insertion-rencontre.fr/api' >> .env.prod
+            cat > .env.prod << 'ENVEOF'
+          DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db
+          JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
+          JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+          NODE_ENV=production
+          LOG_LEVEL=info
+          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+          FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr
+          SMTP_HOST=smtp.gmail.com
+          SMTP_PORT=587
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASS=${{ secrets.SMTP_PASS }}
+          SMTP_FROM=${{ secrets.SMTP_FROM }}
+          FRONTEND_URL=https://accueil-insertion-rencontre.fr
+          PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api
+          PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr
+          API_URL=https://accueil-insertion-rencontre.fr/api
+          ENVEOF
           "
 
           # Déployer l'API sur production
