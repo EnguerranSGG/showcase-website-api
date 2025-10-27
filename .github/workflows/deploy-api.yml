@@ -64,14 +64,14 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            # Créer le répertoire de backup
-            mkdir -p /backups/air &&
+            # Créer le répertoire de backup local
+            mkdir -p ./backups &&
             # Créer le script de backup s'il n'existe pas
             if [ ! -f ./scripts/backup-full.sh ]; then
               mkdir -p ./scripts &&
               cat > ./scripts/backup-full.sh << 'EOF'
           #!/bin/bash
-          BACKUP_DIR=\"/backups/air\"
+          BACKUP_DIR=\"/opt/air/backups\"
           TIMESTAMP=\$(date +%Y%m%d-%H%M%S)
           BACKUP_NAME=\"backup-\${TIMESTAMP}\"
           echo \"🔄 Début du backup: \${BACKUP_NAME}\"
