@@ -114,10 +114,14 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo '=== Contenu du fichier .env.prod ===' && cat /opt/air/.env.prod"
           echo "✅ Vérification .env.prod terminée"
 
-          # Étape 7 : Arrêter les conteneurs existants
-          echo "🛑 Étape 7 : Arrêt des conteneurs existants"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "docker compose -f /opt/air/docker-compose.prod.yml down"
-          echo "✅ Conteneurs arrêtés"
+          # Étape 7 : Arrêter tous les conteneurs existants
+          echo "🛑 Étape 7 : Arrêt de tous les conteneurs existants"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml down &&
+            docker stop \$(docker ps -q) 2>/dev/null || true &&
+            docker rm \$(docker ps -aq) 2>/dev/null || true
+          "
+          echo "✅ Tous les conteneurs arrêtés"
 
           # Étape 8 : Nettoyer Docker avant le build
           echo "🧹 Étape 8 : Nettoyage Docker"
