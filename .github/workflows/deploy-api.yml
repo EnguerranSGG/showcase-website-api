@@ -116,59 +116,57 @@ jobs:
 
           # Étape 7 : Arrêter les conteneurs existants
           echo "🛑 Étape 7 : Arrêt des conteneurs existants"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml down"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "docker compose -f /opt/air/docker-compose.prod.yml down"
           echo "✅ Conteneurs arrêtés"
 
           # Étape 8 : Builder les images avec les variables d'environnement
           echo "🔨 Étape 8 : Build des images Docker"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            cd /opt/air &&
+            \
             export ADMIN_EMAIL='${{ secrets.ADMIN_EMAIL }}' &&
             export ADMIN_PASSWORD='${{ secrets.ADMIN_PASSWORD }}' &&
             export JWT_ACCESS_SECRET='${{ secrets.JWT_ACCESS_SECRET }}' &&
             export JWT_REFRESH_SECRET='${{ secrets.JWT_REFRESH_SECRET }}' &&
-            docker compose -f docker-compose.prod.yml build --no-cache api db
+            docker compose -f /opt/air/docker-compose.prod.yml build --no-cache api db
           "
           echo "✅ Images Docker buildées"
 
           # Étape 9 : Démarrer les conteneurs avec diagnostic immédiat
           echo "🚀 Étape 9 : Démarrage des conteneurs avec diagnostic"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            cd /opt/air &&
             echo '=== Démarrage des conteneurs ===' &&
-            docker compose -f docker-compose.prod.yml up -d api db &&
+            docker compose -f /opt/air/docker-compose.prod.yml up -d api db &&
             sleep 10 &&
             echo '=== État des conteneurs ===' &&
-            docker compose -f docker-compose.prod.yml ps &&
+            docker compose -f /opt/air/docker-compose.prod.yml ps &&
             echo '=== Logs du conteneur API (dernières 100 lignes) ===' &&
-            docker compose -f docker-compose.prod.yml logs --tail=100 api &&
+            docker compose -f /opt/air/docker-compose.prod.yml logs --tail=100 api &&
             echo '=== Logs du conteneur DB (dernières 20 lignes) ===' &&
-            docker compose -f docker-compose.prod.yml logs --tail=20 db &&
+            docker compose -f /opt/air/docker-compose.prod.yml logs --tail=20 db &&
             echo '=== Contenu du fichier .env.prod ===' &&
-            cat .env.prod &&
+            cat /opt/air/.env.prod &&
             echo '=== Test de connexion à la base de données ===' &&
-            docker compose -f docker-compose.prod.yml exec -T db pg_isready -U postgres
+            docker compose -f /opt/air/docker-compose.prod.yml exec -T db pg_isready -U postgres
           "
           echo "✅ Diagnostic des conteneurs terminé"
 
           # Étape 9.5 : Diagnostic spécifique de l'API
           echo "🔍 Étape 9.5 : Diagnostic spécifique de l'API"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            cd /opt/air &&
             echo '=== État détaillé des conteneurs ===' &&
-            docker compose -f docker-compose.prod.yml ps -a &&
+            docker compose -f /opt/air/docker-compose.prod.yml ps -a &&
             echo '=== Logs complets de l API (même si arrêté) ===' &&
-            docker compose -f docker-compose.prod.yml logs api &&
+            docker compose -f /opt/air/docker-compose.prod.yml logs api &&
             echo '=== Logs du conteneur air-api-1 directement ===' &&
             docker logs air-api-1 2>&1 || echo 'Conteneur air-api-1 non trouvé' &&
             echo '=== Test de démarrage de l API en mode interactif ===' &&
-            docker compose -f docker-compose.prod.yml run --rm api node dist/main || echo 'Erreur lors du démarrage de l API'
+            docker compose -f /opt/air/docker-compose.prod.yml run --rm api node dist/main || echo 'Erreur lors du démarrage de l API'
           "
           echo "✅ Diagnostic spécifique de l'API terminé"
 
           # Étape 10 : Attendre et appliquer les migrations
           echo "🗄️ Étape 10 : Application des migrations"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && sleep 30 && docker compose -f docker-compose.prod.yml exec -T api npx prisma migrate deploy"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "sleep 30 && docker compose -f /opt/air/docker-compose.prod.yml exec -T api npx prisma migrate deploy"
           echo "✅ Migrations appliquées"
 
           # Étape 11 : Vérifier s'il y a des admins et seed si nécessaire
