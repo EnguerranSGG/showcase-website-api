@@ -3,6 +3,9 @@ services:
     build:
       context: /opt/air/front-air/astro-site
       dockerfile: Dockerfile.prod
+      args:
+        PUBLIC_API_URL: ${PUBLIC_API_URL}
+        PUBLIC_ASSET_URL: ${PUBLIC_ASSET_URL}
     container_name: astro-site-prod
     environment:
       - NODE_ENV=production
@@ -20,6 +23,8 @@ services:
     build:
       context: /opt/air/front-air/admin-dashboard
       dockerfile: Dockerfile.prod
+      args:
+        API_URL: ${API_URL}
     container_name: admin-dashboard-prod
     environment:
       - NODE_ENV=production
