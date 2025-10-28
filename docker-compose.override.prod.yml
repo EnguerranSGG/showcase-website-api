@@ -1,7 +1,7 @@
 services:
   astro-site:
     build:
-      context: ../front-air/astro-site
+      context: /opt/air/front-air/astro-site
       dockerfile: Dockerfile.prod
     container_name: astro-site-prod
     environment:
@@ -18,7 +18,7 @@ services:
 
   admin-dashboard:
     build:
-      context: ../front-air/admin-dashboard
+      context: /opt/air/front-air/admin-dashboard
       dockerfile: Dockerfile.prod
     container_name: admin-dashboard-prod
     environment:
