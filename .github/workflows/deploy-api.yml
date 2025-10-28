@@ -119,10 +119,17 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "docker compose -f /opt/air/docker-compose.prod.yml down"
           echo "✅ Conteneurs arrêtés"
 
-          # Étape 8 : Builder les images avec les variables d'environnement
-          echo "🔨 Étape 8 : Build des images Docker"
+          # Étape 8 : Nettoyer Docker avant le build
+          echo "🧹 Étape 8 : Nettoyage Docker"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            \
+            docker system prune -f &&
+            docker image prune -f
+          "
+          echo "✅ Docker nettoyé"
+
+          # Étape 9 : Builder les images avec les variables d'environnement
+          echo "🔨 Étape 9 : Build des images Docker"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             export ADMIN_EMAIL='${{ secrets.ADMIN_EMAIL }}' &&
             export ADMIN_PASSWORD='${{ secrets.ADMIN_PASSWORD }}' &&
             export JWT_ACCESS_SECRET='${{ secrets.JWT_ACCESS_SECRET }}' &&
@@ -131,8 +138,8 @@ jobs:
           "
           echo "✅ Images Docker buildées"
 
-          # Étape 9 : Démarrer les conteneurs avec diagnostic immédiat
-          echo "🚀 Étape 9 : Démarrage des conteneurs avec diagnostic"
+          # Étape 10 : Démarrer les conteneurs avec diagnostic immédiat
+          echo "🚀 Étape 10 : Démarrage des conteneurs avec diagnostic"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             echo '=== Démarrage des conteneurs ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml up -d api db &&
@@ -150,8 +157,8 @@ jobs:
           "
           echo "✅ Diagnostic des conteneurs terminé"
 
-          # Étape 9.5 : Diagnostic spécifique de l'API
-          echo "🔍 Étape 9.5 : Diagnostic spécifique de l'API"
+          # Étape 10.5 : Diagnostic spécifique de l'API
+          echo "🔍 Étape 10.5 : Diagnostic spécifique de l'API"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             echo '=== État détaillé des conteneurs ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml ps -a &&
@@ -164,17 +171,17 @@ jobs:
           "
           echo "✅ Diagnostic spécifique de l'API terminé"
 
-          # Étape 10 : Attendre et appliquer les migrations
-          echo "🗄️ Étape 10 : Application des migrations"
+          # Étape 11 : Attendre et appliquer les migrations
+          echo "🗄️ Étape 11 : Application des migrations"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "sleep 30 && docker compose -f /opt/air/docker-compose.prod.yml exec -T api npx prisma migrate deploy"
           echo "✅ Migrations appliquées"
 
-          # Étape 11 : Vérifier s'il y a des admins et seed si nécessaire
-          echo "👤 Étape 11 : Vérification des admins et seed conditionnel"
+          # Étape 12 : Vérifier s'il y a des admins et seed si nécessaire
+          echo "👤 Étape 12 : Vérification des admins et seed conditionnel"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd /opt/air && docker compose -f docker-compose.prod.yml exec -T api npx prisma db execute --stdin <<< \"SELECT COUNT(*) FROM User WHERE role = 'ADMIN'\" | tail -1 | tr -d ' ' > /tmp/admin_count.txt"
 
-          # Étape 12 : Lire le résultat et décider du seed
-          echo "🌱 Étape 12 : Exécution conditionnelle du seed"
+          # Étape 13 : Lire le résultat et décider du seed
+          echo "🌱 Étape 13 : Exécution conditionnelle du seed"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
             ADMIN_COUNT=\$(cat /tmp/admin_count.txt) &&
