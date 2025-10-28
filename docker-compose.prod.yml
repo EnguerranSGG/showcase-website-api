@@ -20,9 +20,6 @@ services:
         ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgres://air-admin:air-admin-password@db:5432/air-db
-      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
     expose:
       - 3000
     depends_on:
