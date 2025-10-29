@@ -119,14 +119,23 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo '=== Contenu du fichier .env.prod ===' && cat /opt/air/.env.prod"
           echo "✅ Vérification .env.prod terminée"
 
-          # Étape 7 : Arrêter tous les conteneurs existants
-          echo "🛑 Étape 7 : Arrêt de tous les conteneurs existants"
+          # Étape 7 : Arrêter tous les conteneurs existants et nettoyer les orphelins
+          echo "🛑 Étape 7 : Arrêt de tous les conteneurs existants et nettoyage des orphelins"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml down &&
-            docker stop \$(docker ps -q) 2>/dev/null || true &&
+            # Arrêter tous les conteneurs en cours
+            docker stop \$(docker ps -q) 2>/dev/null || true
+            # Supprimer tous les conteneurs arrêtés
             docker rm \$(docker ps -aq) 2>/dev/null || true
+            # Supprimer spécifiquement les conteneurs orphelins air-api-run-*
+            docker ps -a --filter 'name=air-api-run-' --format '{{.ID}}' | while read id; do docker rm -f \$id 2>/dev/null || true; done
+            # Docker compose down
+            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml down 2>/dev/null || true
+            # Forcer la suppression du réseau s'il existe encore
+            docker network rm air_backend 2>/dev/null || true
+            # Nettoyer les réseaux orphelins
+            docker network prune -f
           "
-          echo "✅ Tous les conteneurs arrêtés"
+          echo "✅ Tous les conteneurs arrêtés et nettoyés"
 
           # Étape 8 : Nettoyer Docker avant le build
           echo "🧹 Étape 8 : Nettoyage Docker"
