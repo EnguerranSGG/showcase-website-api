@@ -204,6 +204,18 @@ jobs:
           "
           echo "✅ Seed conditionnel terminé"
 
+          # Étape 14 : Démarrer tous les conteneurs (API + Frontend + Nginx)
+          echo "🚀 Étape 14 : Démarrage de tous les conteneurs (API + Frontend + Nginx)"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            export PUBLIC_API_URL='https://accueil-insertion-rencontre.fr/api' &&
+            export PUBLIC_ASSET_URL='https://accueil-insertion-rencontre.fr' &&
+            export API_URL='https://accueil-insertion-rencontre.fr/api' &&
+            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml up -d &&
+            sleep 5 &&
+            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml ps
+          "
+          echo "✅ Tous les conteneurs démarrés"
+
           echo "🎉 === DÉPLOIEMENT API TERMINÉ AVEC SUCCÈS ==="
 
       - name: Health check API production
