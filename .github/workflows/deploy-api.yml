@@ -109,6 +109,11 @@ jobs:
           "
           echo "✅ Fichier .env.prod créé"
 
+          # Étape 5.5 : Créer le fichier .env (lecture automatique par Docker Compose)
+          echo "⚙️ Étape 5.5 : Création du fichier .env pour Docker Compose"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cp /opt/air/.env.prod /opt/air/.env"
+          echo "✅ Fichier .env créé"
+
           # Étape 6 : Vérifier le fichier .env.prod
           echo "🔍 Étape 6 : Vérification du fichier .env.prod"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo '=== Contenu du fichier .env.prod ===' && cat /opt/air/.env.prod"
@@ -205,5 +210,5 @@ jobs:
         run: |
           echo "🏥 Vérification de la santé de l'API"
           sleep 30
-          curl -f https://accueil-insertion-rencontre.fr/api/health || exit 1
+          curl -f http://accueil-insertion-rencontre.fr/api || exit 1
           echo "✅ API en bonne santé"
