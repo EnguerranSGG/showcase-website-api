@@ -183,9 +183,7 @@ jobs:
             echo '=== Logs complets de l API (même si arrêté) ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml logs api &&
             echo '=== Logs du conteneur air-api-1 directement ===' &&
-            docker logs air-api-1 2>&1 || echo 'Conteneur air-api-1 non trouvé' &&
-            echo '=== Test de démarrage de l API en mode interactif ===' &&
-            docker compose -f /opt/air/docker-compose.prod.yml run --rm api node dist/main || echo 'Erreur lors du démarrage de l API'
+            docker logs air-api-1 2>&1 || echo 'Conteneur air-api-1 non trouvé'
           "
           echo "✅ Diagnostic spécifique de l'API terminé"
 
@@ -216,9 +214,13 @@ jobs:
           # Étape 14 : Démarrer tous les conteneurs (API + Frontend + Nginx)
           echo "🚀 Étape 14 : Démarrage de tous les conteneurs (API + Frontend + Nginx)"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            # Nettoyer les conteneurs orphelins avant de démarrer
+            docker ps -a --filter 'name=air-api-run-' --format '{{.ID}}' | while read id; do docker rm -f \$id 2>/dev/null || true; done
+            # Exporter les variables d'environnement
             export PUBLIC_API_URL='https://accueil-insertion-rencontre.fr/api' &&
             export PUBLIC_ASSET_URL='https://accueil-insertion-rencontre.fr' &&
             export API_URL='https://accueil-insertion-rencontre.fr/api' &&
+            # Démarrer tous les conteneurs
             docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml up -d &&
             sleep 5 &&
             docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml ps
