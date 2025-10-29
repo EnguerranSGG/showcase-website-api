@@ -46,6 +46,10 @@ systemctl stop nginx 2>/dev/null || true
 echo "🐳 Démarrage des conteneurs en mode HTTP..."
 cd "$PROJECT_DIR"
 docker compose -f docker-compose.prod.yml -f docker-compose.override.prod.yml down
+# Exporter les variables d'environnement nécessaires
+export PUBLIC_API_URL='https://accueil-insertion-rencontre.fr/api'
+export PUBLIC_ASSET_URL='https://accueil-insertion-rencontre.fr'
+export API_URL='https://accueil-insertion-rencontre.fr/api'
 docker compose -f docker-compose.prod.yml -f docker-compose.override.prod.yml up -d
 
 # Attendre que les services soient prêts
@@ -101,6 +105,10 @@ cp "$PROJECT_DIR/nginx/nginx-ssl.conf" "$PROJECT_DIR/nginx/nginx.conf"
 # Redémarrer les conteneurs avec la nouvelle configuration
 echo "🔄 Redémarrage avec la configuration SSL..."
 docker compose -f docker-compose.prod.yml -f docker-compose.override.prod.yml down
+# Exporter les variables d'environnement nécessaires
+export PUBLIC_API_URL='https://accueil-insertion-rencontre.fr/api'
+export PUBLIC_ASSET_URL='https://accueil-insertion-rencontre.fr'
+export API_URL='https://accueil-insertion-rencontre.fr/api'
 docker compose -f docker-compose.prod.yml -f docker-compose.override.prod.yml up -d
 
 # Attendre le redémarrage
