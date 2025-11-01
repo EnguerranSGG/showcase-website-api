@@ -220,6 +220,13 @@ jobs:
             export PUBLIC_API_URL='https://accueil-insertion-rencontre.fr/api' &&
             export PUBLIC_ASSET_URL='https://accueil-insertion-rencontre.fr' &&
             export API_URL='https://accueil-insertion-rencontre.fr/api' &&
+            # Rebuild le frontend avec les bonnes variables d'environnement (si les fichiers frontend existent)
+            if [ -d '/opt/air/front-air/astro-site' ] && [ -d '/opt/air/front-air/admin-dashboard' ]; then
+              echo 'Rebuild du frontend avec les variables d environnement...' &&
+              docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml build --no-cache astro-site admin-dashboard
+            else
+              echo 'Frontend non présent, skip du rebuild'
+            fi &&
             # Démarrer tous les conteneurs
             docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml up -d &&
             sleep 5 &&
