@@ -76,13 +76,31 @@ async function bootstrap() {
     }),
   );
 
+  // Configuration CORS
+  const frontendOrigins = process.env.FRONTEND_ORIGIN
+    ? process.env.FRONTEND_ORIGIN.split(',').map((origin) => origin.trim())
+    : ['http://localhost:4200', 'http://localhost:4321'];
+
   await app.register(fastifyCors, {
-    origin:
-      process.env.FRONTEND_ORIGIN ||
-      'http://localhost:4200' ||
-      'http://localhost:4321',
+    origin: (origin, cb) => {
+      // Autoriser les requêtes sans origine (par exemple, Postman, curl)
+      if (!origin) {
+        return cb(null, true);
+      }
+      // Vérifier si l'origine est dans la liste autorisée
+      if (frontendOrigins.includes(origin)) {
+        return cb(null, true);
+      }
+      // Autoriser les origines locales en développement
+      if (process.env.NODE_ENV === 'development') {
+        return cb(null, true);
+      }
+      // Refuser toutes les autres origines
+      return cb(new Error('Not allowed by CORS'), false);
+    },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.setGlobalPrefix('api');
