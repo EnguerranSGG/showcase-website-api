@@ -77,7 +77,7 @@ jobs:
               # Étape 3 : Copier les fichiers API
               echo "📋 Étape 3 : Copie des fichiers API"
               echo "=== Début de la copie des fichiers ==="
-              rsync -az --delete --exclude '.git' --exclude 'node_modules' --exclude 'dist' -e "ssh -o StrictHostKeyChecking=no" ./ ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
+              rsync -az --delete --exclude '.git' --exclude 'node_modules' --exclude 'dist' --exclude 'front-air' --exclude 'nginx/ssl' -e "ssh -o StrictHostKeyChecking=no" ./ ${{ secrets.USER }}@${{ secrets.HOST }}:/opt/air/
               echo "=== Fin de la copie des fichiers ==="
               echo "✅ Fichiers copiés"
 
