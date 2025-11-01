@@ -233,11 +233,16 @@ jobs:
         run: |
           echo "🏥 Vérification de la santé de l'API"
           sleep 30
+          # Tester HTTPS directement (avec redirection si nécessaire)
           # L'API retourne 401 (Unauthorized) ce qui signifie qu'elle fonctionne mais nécessite une authentification
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://accueil-insertion-rencontre.fr/api || echo "000")
-          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "401" ]; then
+          # 301 indique une redirection valide (HTTP -> HTTPS)
+          HTTP_CODE=$(curl -sL -o /dev/null -w "%{http_code}" https://accueil-insertion-rencontre.fr/api 2>/dev/null || echo "000")
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "401" ] || [ "$HTTP_CODE" = "301" ]; then
             echo "✅ API en bonne santé (HTTP $HTTP_CODE)"
           else
             echo "❌ API non accessible (HTTP $HTTP_CODE)"
+            echo "⚠️  Tentative avec HTTP pour diagnostic..."
+            HTTP_CODE_HTTP=$(curl -sL -o /dev/null -w "%{http_code}" http://accueil-insertion-rencontre.fr/api 2>/dev/null || echo "000")
+            echo "Code HTTP (via HTTP): $HTTP_CODE_HTTP"
             exit 1
           fi
