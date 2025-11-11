@@ -121,7 +121,20 @@ jobs:
 
           # Étape 6 : Vérifier le fichier .env.prod
           echo "🔍 Étape 6 : Vérification du fichier .env.prod"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo '=== Contenu du fichier .env.prod ===' && cat /opt/air/.env.prod" || (echo "⚠️ Impossible de lire le fichier .env.prod" && exit 1)
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${{ secrets.USER }}@${{ secrets.HOST }} "
+            echo '=== Vérification de l existence du fichier .env.prod ===' &&
+            if [ -f /opt/air/.env.prod ]; then
+              echo 'Fichier .env.prod trouvé' &&
+              echo '=== Nombre de lignes ===' &&
+              wc -l /opt/air/.env.prod &&
+              echo '=== Premières lignes (sans secrets) ===' &&
+              head -5 /opt/air/.env.prod | sed 's/=.*/=***/' &&
+              echo '✅ Fichier .env.prod valide'
+            else
+              echo '❌ Fichier .env.prod non trouvé' &&
+              exit 1
+            fi
+          " || (echo "⚠️ Erreur lors de la vérification du fichier .env.prod" && exit 1)
           echo "✅ Vérification .env.prod terminée"
           echo "📝 Progression: Étape 6 terminée, passage à l'étape 7"
 
