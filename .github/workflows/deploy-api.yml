@@ -126,21 +126,23 @@ jobs:
 
           # Étape 7 : Arrêter tous les conteneurs existants et nettoyer les orphelins
           echo "🛑 Étape 7 : Arrêt de tous les conteneurs existants et nettoyage des orphelins"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ${{ secrets.USER }}@${{ secrets.HOST }} "
+            set +e
             echo '=== Arrêt des conteneurs ===' &&
-            docker stop \$(docker ps -q) 2>/dev/null || echo 'Aucun conteneur à arrêter' &&
+            (docker stop \$(docker ps -q) 2>/dev/null || echo 'Aucun conteneur à arrêter') &&
             echo '=== Suppression des conteneurs ===' &&
-            docker rm \$(docker ps -aq) 2>/dev/null || echo 'Aucun conteneur à supprimer' &&
+            (docker rm \$(docker ps -aq) 2>/dev/null || echo 'Aucun conteneur à supprimer') &&
             echo '=== Suppression des conteneurs orphelins air-api-run-* ===' &&
-            docker ps -a --filter 'name=air-api-run-' --format '{{.ID}}' | while read id; do docker rm -f \$id 2>/dev/null || true; done &&
+            docker ps -a --filter 'name=air-api-run-' --format '{{.ID}}' 2>/dev/null | while read id; do docker rm -f \$id 2>/dev/null || true; done || true &&
             echo '=== Docker compose down ===' &&
-            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml down 2>/dev/null || echo 'Docker compose down ignoré' &&
+            (docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml down 2>/dev/null || echo 'Docker compose down ignoré') &&
             echo '=== Suppression du réseau air_backend ===' &&
-            docker network rm air_backend 2>/dev/null || echo 'Réseau air_backend non trouvé' &&
+            (docker network rm air_backend 2>/dev/null || echo 'Réseau air_backend non trouvé') &&
             echo '=== Nettoyage des réseaux orphelins ===' &&
-            docker network prune -f &&
+            (docker network prune -f 2>/dev/null || echo 'Nettoyage réseau ignoré') &&
             echo '✅ Nettoyage terminé'
-          " || (echo "⚠️ Erreur lors du nettoyage (peut être ignorée)" && true)
+            set -e
+          " || (echo "⚠️ Erreur lors du nettoyage (continuons quand même)" && true)
           echo "✅ Tous les conteneurs arrêtés et nettoyés"
           echo "📝 Progression: Étape 7 terminée, passage à l'étape 8"
 
