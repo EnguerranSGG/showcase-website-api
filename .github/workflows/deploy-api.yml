@@ -83,59 +83,66 @@ jobs:
 
           # Étape 4 : Vérifier la copie
           echo "🔍 Étape 4 : Vérification de la copie"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "ls -la /opt/air/"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "ls -la /opt/air/ | head -20" || (echo "⚠️ Erreur lors de la vérification" && exit 1)
           echo "✅ Vérification terminée"
+          echo "📝 Progression: Étape 4 terminée, passage à l'étape 5"
 
           # Étape 5 : Créer le fichier .env.prod
           echo "⚙️ Étape 5 : Création du fichier .env.prod"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            echo 'DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db' > /opt/air/.env.prod
-            echo 'JWT_ACCESS_SECRET=\"${{ secrets.JWT_ACCESS_SECRET }}\"' >> /opt/air/.env.prod
-            echo 'JWT_REFRESH_SECRET=\"${{ secrets.JWT_REFRESH_SECRET }}\"' >> /opt/air/.env.prod
-            echo 'NODE_ENV=production' >> /opt/air/.env.prod
-            echo 'LOG_LEVEL=info' >> /opt/air/.env.prod
-            echo 'ADMIN_EMAIL=\"${{ secrets.ADMIN_EMAIL }}\"' >> /opt/air/.env.prod
-            echo 'ADMIN_PASSWORD=\"${{ secrets.ADMIN_PASSWORD }}\"' >> /opt/air/.env.prod
-            echo 'FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr' >> /opt/air/.env.prod
-            echo 'SMTP_HOST=smtp.gmail.com' >> /opt/air/.env.prod
-            echo 'SMTP_PORT=587' >> /opt/air/.env.prod
-            echo 'SMTP_USER=\"${{ secrets.SMTP_USER }}\"' >> /opt/air/.env.prod
-            echo 'SMTP_PASS=\"${{ secrets.SMTP_PASS }}\"' >> /opt/air/.env.prod
-            echo 'SMTP_FROM=\"${{ secrets.SMTP_FROM }}\"' >> /opt/air/.env.prod
-            echo 'FRONTEND_URL=https://accueil-insertion-rencontre.fr' >> /opt/air/.env.prod
-            echo 'PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api' >> /opt/air/.env.prod
-            echo 'PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr' >> /opt/air/.env.prod
-            echo 'API_URL=https://accueil-insertion-rencontre.fr/api' >> /opt/air/.env.prod
-          "
+            echo 'DATABASE_URL=postgresql://postgres:air-admin-password@db:5432/air_db' > /opt/air/.env.prod &&
+            echo 'JWT_ACCESS_SECRET=\"${{ secrets.JWT_ACCESS_SECRET }}\"' >> /opt/air/.env.prod &&
+            echo 'JWT_REFRESH_SECRET=\"${{ secrets.JWT_REFRESH_SECRET }}\"' >> /opt/air/.env.prod &&
+            echo 'NODE_ENV=production' >> /opt/air/.env.prod &&
+            echo 'LOG_LEVEL=info' >> /opt/air/.env.prod &&
+            echo 'ADMIN_EMAIL=\"${{ secrets.ADMIN_EMAIL }}\"' >> /opt/air/.env.prod &&
+            echo 'ADMIN_PASSWORD=\"${{ secrets.ADMIN_PASSWORD }}\"' >> /opt/air/.env.prod &&
+            echo 'FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr' >> /opt/air/.env.prod &&
+            echo 'SMTP_HOST=smtp.gmail.com' >> /opt/air/.env.prod &&
+            echo 'SMTP_PORT=587' >> /opt/air/.env.prod &&
+            echo 'SMTP_USER=\"${{ secrets.SMTP_USER }}\"' >> /opt/air/.env.prod &&
+            echo 'SMTP_PASS=\"${{ secrets.SMTP_PASS }}\"' >> /opt/air/.env.prod &&
+            echo 'SMTP_FROM=\"${{ secrets.SMTP_FROM }}\"' >> /opt/air/.env.prod &&
+            echo 'FRONTEND_URL=https://accueil-insertion-rencontre.fr' >> /opt/air/.env.prod &&
+            echo 'PUBLIC_API_URL=https://accueil-insertion-rencontre.fr/api' >> /opt/air/.env.prod &&
+            echo 'PUBLIC_ASSET_URL=https://accueil-insertion-rencontre.fr' >> /opt/air/.env.prod &&
+            echo 'API_URL=https://accueil-insertion-rencontre.fr/api' >> /opt/air/.env.prod &&
+            echo 'Fichier .env.prod créé avec succès'
+          " || (echo "❌ Erreur lors de la création du fichier .env.prod" && exit 1)
           echo "✅ Fichier .env.prod créé"
+          echo "📝 Progression: Étape 5 terminée, passage à l'étape 5.5"
 
           # Étape 5.5 : Créer le fichier .env (lecture automatique par Docker Compose)
           echo "⚙️ Étape 5.5 : Création du fichier .env pour Docker Compose"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cp /opt/air/.env.prod /opt/air/.env"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cp /opt/air/.env.prod /opt/air/.env && echo 'Fichier .env créé avec succès'" || (echo "❌ Erreur lors de la copie du fichier .env" && exit 1)
           echo "✅ Fichier .env créé"
+          echo "📝 Progression: Étape 5.5 terminée, passage à l'étape 6"
 
           # Étape 6 : Vérifier le fichier .env.prod
           echo "🔍 Étape 6 : Vérification du fichier .env.prod"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo '=== Contenu du fichier .env.prod ===' && cat /opt/air/.env.prod"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo '=== Contenu du fichier .env.prod ===' && cat /opt/air/.env.prod" || (echo "⚠️ Impossible de lire le fichier .env.prod" && exit 1)
           echo "✅ Vérification .env.prod terminée"
+          echo "📝 Progression: Étape 6 terminée, passage à l'étape 7"
 
           # Étape 7 : Arrêter tous les conteneurs existants et nettoyer les orphelins
           echo "🛑 Étape 7 : Arrêt de tous les conteneurs existants et nettoyage des orphelins"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            # Arrêter tous les conteneurs en cours
-            docker stop \$(docker ps -q) 2>/dev/null || true
-            # Supprimer tous les conteneurs arrêtés
-            docker rm \$(docker ps -aq) 2>/dev/null || true
-            # Supprimer spécifiquement les conteneurs orphelins air-api-run-*
-            docker ps -a --filter 'name=air-api-run-' --format '{{.ID}}' | while read id; do docker rm -f \$id 2>/dev/null || true; done
-            # Docker compose down
-            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml down 2>/dev/null || true
-            # Forcer la suppression du réseau s'il existe encore
-            docker network rm air_backend 2>/dev/null || true
-            # Nettoyer les réseaux orphelins
-            docker network prune -f
-          "
+            echo '=== Arrêt des conteneurs ===' &&
+            docker stop \$(docker ps -q) 2>/dev/null || echo 'Aucun conteneur à arrêter' &&
+            echo '=== Suppression des conteneurs ===' &&
+            docker rm \$(docker ps -aq) 2>/dev/null || echo 'Aucun conteneur à supprimer' &&
+            echo '=== Suppression des conteneurs orphelins air-api-run-* ===' &&
+            docker ps -a --filter 'name=air-api-run-' --format '{{.ID}}' | while read id; do docker rm -f \$id 2>/dev/null || true; done &&
+            echo '=== Docker compose down ===' &&
+            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml down 2>/dev/null || echo 'Docker compose down ignoré' &&
+            echo '=== Suppression du réseau air_backend ===' &&
+            docker network rm air_backend 2>/dev/null || echo 'Réseau air_backend non trouvé' &&
+            echo '=== Nettoyage des réseaux orphelins ===' &&
+            docker network prune -f &&
+            echo '✅ Nettoyage terminé'
+          " || (echo "⚠️ Erreur lors du nettoyage (peut être ignorée)" && true)
           echo "✅ Tous les conteneurs arrêtés et nettoyés"
+          echo "📝 Progression: Étape 7 terminée, passage à l'étape 8"
 
           # Étape 8 : Nettoyer Docker avant le build
           echo "🧹 Étape 8 : Nettoyage Docker"
