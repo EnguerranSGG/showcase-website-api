@@ -45,6 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -156,14 +157,22 @@ jobs:
 
           # Étape 9 : Builder les images avec les variables d'environnement
           echo "🔨 Étape 9 : Build des images Docker"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=3 ${{ secrets.USER }}@${{ secrets.HOST }} "
+            echo '=== Export des variables d environnement ===' &&
             export ADMIN_EMAIL='${{ secrets.ADMIN_EMAIL }}' &&
             export ADMIN_PASSWORD='${{ secrets.ADMIN_PASSWORD }}' &&
             export JWT_ACCESS_SECRET='${{ secrets.JWT_ACCESS_SECRET }}' &&
             export JWT_REFRESH_SECRET='${{ secrets.JWT_REFRESH_SECRET }}' &&
-            docker compose -f /opt/air/docker-compose.prod.yml build --no-cache api db
-          "
+            echo 'Variables exportées' &&
+            echo '=== Début du build Docker ===' &&
+            echo 'Build de l image API...' &&
+            docker compose -f /opt/air/docker-compose.prod.yml build --no-cache api &&
+            echo 'Build de l image DB...' &&
+            docker compose -f /opt/air/docker-compose.prod.yml build --no-cache db &&
+            echo '✅ Build terminé'
+          " || (echo "❌ Erreur lors du build Docker" && exit 1)
           echo "✅ Images Docker buildées"
+          echo "📝 Progression: Étape 9 terminée, passage à l'étape 10"
 
           # Étape 10 : Démarrer les conteneurs avec diagnostic immédiat
           echo "🚀 Étape 10 : Démarrage des conteneurs avec diagnostic"
