@@ -191,6 +191,7 @@ jobs:
           echo "🗄️ Étape 11 : Application des migrations"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "sleep 30 && docker compose -f /opt/air/docker-compose.prod.yml exec -T api npx prisma migrate deploy" || echo "⚠️ Erreur lors de l'application des migrations (peut être ignorée si déjà appliquées)"
           echo "✅ Migrations appliquées"
+          echo "📝 Progression: Étape 11 terminée, passage à l'étape 12"
 
           # Étape 12 : Vérifier s'il y a des admins et seed si nécessaire
           echo "👤 Étape 12 : Vérification des admins et seed conditionnel"
@@ -212,6 +213,7 @@ jobs:
             \" | tail -1 | tr -d ' ' > /tmp/admin_count.txt || echo '0' > /tmp/admin_count.txt
           " || echo "⚠️ Erreur lors de la vérification des admins"
           echo "✅ Vérification des admins terminée"
+          echo "📝 Progression: Étape 12 terminée, passage à l'étape 13"
 
           # Étape 13 : Lire le résultat et décider du seed
           echo "🌱 Étape 13 : Exécution conditionnelle du seed"
@@ -228,29 +230,30 @@ jobs:
             rm -f /tmp/admin_count.txt
           " || echo "⚠️ Erreur lors de l'exécution du seed (peut être ignorée)"
           echo "✅ Seed conditionnel terminé"
+          echo "📝 Progression: Étape 13 terminée, passage à l'étape 14"
 
           # Étape 14 : Démarrer tous les conteneurs (API + Frontend + Nginx)
           echo "🚀 Étape 14 : Démarrage de tous les conteneurs (API + Frontend + Nginx)"
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             # Nettoyer les conteneurs orphelins avant de démarrer
-            docker ps -a --filter 'name=air-api-run-' --format '{{.ID}}' | while read id; do docker rm -f \$id 2>/dev/null || true; done
+            echo '=== Nettoyage des conteneurs orphelins ===' &&
+            docker ps -a --filter 'name=air-api-run-' --format '{{.ID}}' | while read id; do docker rm -f \$id 2>/dev/null || true; done &&
             # Exporter les variables d'environnement
             export PUBLIC_API_URL='https://accueil-insertion-rencontre.fr/api' &&
             export PUBLIC_ASSET_URL='https://accueil-insertion-rencontre.fr' &&
             export API_URL='https://accueil-insertion-rencontre.fr/api' &&
-            # Rebuild le frontend avec les bonnes variables d'environnement (si les fichiers frontend existent)
-            if [ -d '/opt/air/front-air/astro-site' ] && [ -d '/opt/air/front-air/admin-dashboard' ]; then
-              echo 'Rebuild du frontend avec les variables d environnement...' &&
-              docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml build --no-cache astro-site admin-dashboard
-            else
-              echo 'Frontend non présent, skip du rebuild'
-            fi &&
-            # Tester la configuration nginx avant de démarrer
+            echo 'Variables d environnement exportées' &&
+            # Tester la configuration nginx AVANT le build du frontend (plus rapide)
             echo '=== Test de la configuration nginx ===' &&
-            docker run --rm -v /opt/air/nginx/nginx-ssl.conf:/etc/nginx/nginx.conf:ro nginx:1.28 nginx -t 2>&1 || echo '⚠️ Erreur de configuration nginx détectée' &&
-            # Démarrer tous les conteneurs
+            if docker run --rm -v /opt/air/nginx/nginx-ssl.conf:/etc/nginx/nginx.conf:ro nginx:1.28 nginx -t 2>&1; then
+              echo '✅ Configuration nginx valide'
+            else
+              echo '❌ Erreur de configuration nginx détectée'
+              exit 1
+            fi &&
+            # Démarrer tous les conteneurs (le frontend sera rebuildé automatiquement si nécessaire par Docker Compose)
             echo '=== Démarrage de tous les conteneurs ===' &&
-            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml up -d &&
+            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml up -d --build &&
             sleep 10 &&
             echo '=== État de tous les conteneurs ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml ps &&
