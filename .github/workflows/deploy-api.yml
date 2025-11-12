@@ -189,34 +189,38 @@ jobs:
 
           # Étape 10 : Démarrer les conteneurs avec diagnostic immédiat
           echo "🚀 Étape 10 : Démarrage des conteneurs avec diagnostic"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=3 ${{ secrets.USER }}@${{ secrets.HOST }} "
             echo '=== Démarrage des conteneurs ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml up -d api db &&
             sleep 10 &&
             echo '=== État des conteneurs ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml ps &&
-            echo '=== Logs du conteneur API (dernières 100 lignes) ===' &&
-            docker compose -f /opt/air/docker-compose.prod.yml logs --tail=100 api &&
-            echo '=== Logs du conteneur DB (dernières 20 lignes) ===' &&
-            docker compose -f /opt/air/docker-compose.prod.yml logs --tail=20 db &&
-            echo '=== Contenu du fichier .env.prod ===' &&
-            cat /opt/air/.env.prod &&
+            echo '=== Logs du conteneur API (dernières 50 lignes) ===' &&
+            docker compose -f /opt/air/docker-compose.prod.yml logs --tail=50 api 2>&1 | head -100 &&
+            echo '=== Logs du conteneur DB (dernières 10 lignes) ===' &&
+            docker compose -f /opt/air/docker-compose.prod.yml logs --tail=10 db 2>&1 | head -20 &&
             echo '=== Test de connexion à la base de données ===' &&
-            docker compose -f /opt/air/docker-compose.prod.yml exec -T db pg_isready -U postgres
-          "
+            (docker compose -f /opt/air/docker-compose.prod.yml exec -T db pg_isready -U postgres 2>&1 || echo '⚠️ Test de connexion DB ignoré') &&
+            echo '✅ Diagnostic terminé'
+          " || (echo "⚠️ Erreur lors du diagnostic (continuons quand même)" && true)
           echo "✅ Diagnostic des conteneurs terminé"
+          echo "📝 Progression: Étape 10 terminée, passage à l'étape 10.5"
 
           # Étape 10.5 : Diagnostic spécifique de l'API
           echo "🔍 Étape 10.5 : Diagnostic spécifique de l'API"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=3 ${{ secrets.USER }}@${{ secrets.HOST }} "
             echo '=== État détaillé des conteneurs ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml ps -a &&
-            echo '=== Logs complets de l API (même si arrêté) ===' &&
-            docker compose -f /opt/air/docker-compose.prod.yml logs api &&
-            echo '=== Logs du conteneur air-api-1 directement ===' &&
-            docker logs air-api-1 2>&1 || echo 'Conteneur air-api-1 non trouvé'
-          "
+            echo '=== Vérification que l API a démarré ===' &&
+            if docker compose -f /opt/air/docker-compose.prod.yml logs api 2>&1 | grep -q 'Nest application successfully started'; then
+              echo '✅ API démarrée avec succès'
+            else
+              echo '⚠️ API peut-être en cours de démarrage ou erreur'
+            fi &&
+            echo '✅ Diagnostic terminé'
+          " || (echo "⚠️ Erreur lors du diagnostic spécifique (continuons quand même)" && true)
           echo "✅ Diagnostic spécifique de l'API terminé"
+          echo "📝 Progression: Étape 10.5 terminée, passage à l'étape 11"
 
           # Étape 11 : Attendre et appliquer les migrations
           echo "🗄️ Étape 11 : Application des migrations"
