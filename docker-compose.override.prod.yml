@@ -49,6 +49,8 @@ services:
       - api
       - astro-site
       - admin-dashboard
+    networks:
+      - backend
     restart: unless-stopped
 
   api:

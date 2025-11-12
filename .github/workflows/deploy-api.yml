@@ -280,9 +280,9 @@ jobs:
             else
               echo '⚠️ Erreur de configuration nginx détectée (on continue quand même)'
             fi &&
-            # Démarrer nginx maintenant que les frontends sont prêts
+            # Démarrer nginx maintenant que les frontends sont prêts (forcer la recréation pour appliquer la nouvelle config réseau)
             echo '=== Démarrage de nginx ===' &&
-            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml up -d nginx &&
+            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml up -d --force-recreate nginx &&
             sleep 5 &&
             echo '=== État de tous les conteneurs ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml ps &&
