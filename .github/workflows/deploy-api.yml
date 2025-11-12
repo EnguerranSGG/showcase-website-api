@@ -284,6 +284,8 @@ jobs:
             echo '=== Démarrage de nginx ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml up -d --force-recreate nginx &&
             sleep 5 &&
+            echo '=== Rechargement de la configuration nginx ===' &&
+            docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml exec nginx nginx -s reload 2>&1 || echo '⚠️ Rechargement nginx ignoré (démarrage frais)' &&
             echo '=== État de tous les conteneurs ===' &&
             docker compose -f /opt/air/docker-compose.prod.yml -f /opt/air/docker-compose.override.prod.yml ps &&
             echo '=== Logs nginx (dernières 30 lignes) ===' &&
