@@ -58,3 +58,25 @@ echo ""
 echo "10. Vérification du réseau Docker :"
 docker network inspect air_backend 2>/dev/null | grep -A 5 "Containers" || echo "Réseau air_backend non trouvé"
 echo ""
+
+echo "11. Vérification des réseaux de nginx :"
+docker inspect $NGINX_CONTAINER | grep -A 10 "Networks" || echo "Impossible de vérifier les réseaux"
+echo ""
+
+echo "12. Test de résolution DNS depuis nginx :"
+docker exec $NGINX_CONTAINER nslookup admin-dashboard 2>&1 || docker exec $NGINX_CONTAINER getent hosts admin-dashboard 2>&1 || echo "❌ admin-dashboard non résolu"
+echo ""
+
+echo "13. Test avec l'IP directe du conteneur admin-dashboard :"
+ADMIN_IP=$(docker inspect admin-dashboard-prod | grep -A 5 "Networks" | grep "IPAddress" | head -1 | awk '{print $2}' | tr -d '",')
+if [ -n "$ADMIN_IP" ]; then
+    echo "IP de admin-dashboard: $ADMIN_IP"
+    docker exec $NGINX_CONTAINER wget -q -O- --timeout=5 http://$ADMIN_IP:4200/ 2>&1 | head -5 || echo "❌ Connexion échouée même avec IP directe"
+else
+    echo "❌ Impossible de récupérer l'IP de admin-dashboard"
+fi
+echo ""
+
+echo "14. Vérification de la configuration nginx complète pour /admin :"
+docker exec $NGINX_CONTAINER grep -B 5 -A 15 "location /admin" /etc/nginx/nginx.conf
+echo ""
