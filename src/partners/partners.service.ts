@@ -54,8 +54,21 @@ export class PartnersService {
   }
 
   async getAll() {
+    // ⚠️ OPTIMISATION : Exclure le champ 'file.file' (données binaires) pour améliorer les performances
     return this.prisma.partner.findMany({
-      include: { file: true },
+      include: {
+        file: {
+          select: {
+            file_id: true,
+            name: true,
+            title: true,
+            created_at: true,
+            updated_at: true,
+            user_id: true,
+            // Ne PAS inclure 'file' (Bytes) - utiliser /files/:id/download pour télécharger
+          },
+        },
+      },
     });
   }
 }

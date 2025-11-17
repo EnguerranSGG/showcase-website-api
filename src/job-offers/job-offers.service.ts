@@ -56,15 +56,41 @@ export class JobOffersService {
   }
 
   async getById(id: number) {
+    // ⚠️ OPTIMISATION : Exclure le champ 'file.file' (données binaires) pour améliorer les performances
     return this.prisma.job_offer.findUnique({
       where: { job_offer_id: id },
-      include: { file: true },
+      include: {
+        file: {
+          select: {
+            file_id: true,
+            name: true,
+            title: true,
+            created_at: true,
+            updated_at: true,
+            user_id: true,
+            // Ne PAS inclure 'file' (Bytes) - utiliser /files/:id/download pour télécharger
+          },
+        },
+      },
     });
   }
 
   async getAll() {
+    // ⚠️ OPTIMISATION : Exclure le champ 'file.file' (données binaires) pour améliorer les performances
     return this.prisma.job_offer.findMany({
-      include: { file: true },
+      include: {
+        file: {
+          select: {
+            file_id: true,
+            name: true,
+            title: true,
+            created_at: true,
+            updated_at: true,
+            user_id: true,
+            // Ne PAS inclure 'file' (Bytes) - utiliser /files/:id/download pour télécharger
+          },
+        },
+      },
     });
   }
 }
