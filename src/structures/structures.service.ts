@@ -100,10 +100,21 @@ export class StructuresService {
   }
 
   getAll() {
+    // ⚠️ OPTIMISATION : Exclure le champ 'file.file' (données binaires) pour améliorer les performances
     return this.prisma.structure.findMany({
       include: {
         missions: true,
-        file: true,
+        file: {
+          select: {
+            file_id: true,
+            name: true,
+            title: true,
+            created_at: true,
+            updated_at: true,
+            user_id: true,
+            // Ne PAS inclure 'file' (Bytes) - utiliser /files/:id/download pour télécharger
+          },
+        },
         structure_type: true,
       },
     });
@@ -114,9 +125,20 @@ export class StructuresService {
    * Les missions peuvent être récupérées séparément via l'endpoint /missions/structure/:id
    */
   getAllForPublic() {
+    // ⚠️ OPTIMISATION : Exclure le champ 'file.file' (données binaires) pour améliorer les performances
     return this.prisma.structure.findMany({
       include: {
-        file: true,
+        file: {
+          select: {
+            file_id: true,
+            name: true,
+            title: true,
+            created_at: true,
+            updated_at: true,
+            user_id: true,
+            // Ne PAS inclure 'file' (Bytes) - utiliser /files/:id/download pour télécharger
+          },
+        },
         structure_type: true,
         // On inclut seulement le count des missions pour savoir si une structure a des missions
         _count: {
@@ -129,6 +151,7 @@ export class StructuresService {
   }
 
   async getByTypeName(typeName: string) {
+    // ⚠️ OPTIMISATION : Exclure le champ 'file.file' (données binaires) pour améliorer les performances
     const structures = await this.prisma.structure.findMany({
       where: {
         structure_type: {
@@ -137,7 +160,17 @@ export class StructuresService {
       },
       include: {
         missions: true,
-        file: true,
+        file: {
+          select: {
+            file_id: true,
+            name: true,
+            title: true,
+            created_at: true,
+            updated_at: true,
+            user_id: true,
+            // Ne PAS inclure 'file' (Bytes) - utiliser /files/:id/download pour télécharger
+          },
+        },
         structure_type: true,
       },
     });

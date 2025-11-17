@@ -123,7 +123,19 @@ export class FilesService {
   }
 
   async getAll() {
-    return this.prisma.file.findMany();
+    // ⚠️ OPTIMISATION CRITIQUE : Exclure le champ 'file' (données binaires)
+    // qui peut représenter plusieurs Mo de données et ralentir considérablement les requêtes
+    return this.prisma.file.findMany({
+      select: {
+        file_id: true,
+        name: true,
+        title: true,
+        created_at: true,
+        updated_at: true,
+        user_id: true,
+        // Ne PAS inclure 'file' (Bytes) - utiliser /files/:id/download pour télécharger
+      },
+    });
   }
 
   async getTitleById(id: number) {
