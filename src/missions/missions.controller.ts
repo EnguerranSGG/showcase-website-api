@@ -23,7 +23,12 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
+import {
+  GetThrottle,
+  WriteThrottle,
+} from '../auth/decorators/throttle.decorator';
+import { PublicGuard } from '../auth/guards/public.guard';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Missions')
 @Controller('missions')
@@ -85,13 +90,30 @@ export class MissionsController {
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
   @Get('structure/:structureId')
-  @ApiOperation({ summary: 'Récupérer les missions d’une structure' })
+  @ApiOperation({ summary: "Récupérer les missions d'une structure (admin)" })
   @ApiParam({ name: 'structureId', type: Number })
   @ApiResponse({
     status: 200,
     description: 'Liste des missions récupérée avec succès.',
   })
   getByStructure(@Param('structureId') structureId: number) {
+    return this.missionsService.findAllByStructure(Number(structureId));
+  }
+
+  @GetThrottle()
+  @UseGuards(PublicGuard)
+  @Public()
+  @Get('structure/:structureId/public')
+  @ApiOperation({
+    summary:
+      "Récupérer les missions d'une structure (public, pour site vitrine)",
+  })
+  @ApiParam({ name: 'structureId', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des missions récupérée avec succès.',
+  })
+  getByStructurePublic(@Param('structureId') structureId: number) {
     return this.missionsService.findAllByStructure(Number(structureId));
   }
 

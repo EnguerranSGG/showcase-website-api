@@ -13,7 +13,9 @@ export class StructuresService {
       data: {
         name: dto.name,
         file: dto.file_id ? { connect: { file_id: dto.file_id } } : undefined,
-        structure_type: dto.structure_type_id ? { connect: { structure_type_id: dto.structure_type_id } } : undefined,
+        structure_type: dto.structure_type_id
+          ? { connect: { structure_type_id: dto.structure_type_id } }
+          : undefined,
         description: dto.description,
         address: dto.address ?? null,
         phone_number: dto.phone_number ?? null,
@@ -107,6 +109,25 @@ export class StructuresService {
     });
   }
 
+  /**
+   * Récupère toutes les structures sans les missions (pour le site vitrine)
+   * Les missions peuvent être récupérées séparément via l'endpoint /missions/structure/:id
+   */
+  getAllForPublic() {
+    return this.prisma.structure.findMany({
+      include: {
+        file: true,
+        structure_type: true,
+        // On inclut seulement le count des missions pour savoir si une structure a des missions
+        _count: {
+          select: {
+            missions: true,
+          },
+        },
+      },
+    });
+  }
+
   async getByTypeName(typeName: string) {
     const structures = await this.prisma.structure.findMany({
       where: {
@@ -122,7 +143,9 @@ export class StructuresService {
     });
 
     if (!structures || structures.length === 0) {
-      throw new NotFoundException(`Aucune structure trouvée pour le type: ${typeName}`);
+      throw new NotFoundException(
+        `Aucune structure trouvée pour le type: ${typeName}`,
+      );
     }
 
     return structures;

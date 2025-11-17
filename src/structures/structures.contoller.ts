@@ -26,7 +26,10 @@ import { PublicGuard } from 'src/auth/guards/public.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { Logger } from '@nestjs/common';
-import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
+import {
+  GetThrottle,
+  WriteThrottle,
+} from '../auth/decorators/throttle.decorator';
 
 @ApiTags('Structures')
 @Controller('structures')
@@ -105,10 +108,13 @@ export class StructuresController {
   @UseGuards(PublicGuard)
   @Public()
   @Get('all')
-  @ApiOperation({ summary: 'Récupérer toutes les structures' })
+  @ApiOperation({
+    summary: 'Récupérer toutes les structures (avec missions, pour admin)',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Liste des évenements récupérée avec succès.',
+    description:
+      'Liste des structures récupérée avec succès (inclut les missions).',
   })
   getAll() {
     return this.structuresService.getAll();
@@ -117,16 +123,37 @@ export class StructuresController {
   @GetThrottle()
   @UseGuards(PublicGuard)
   @Public()
+  @Get('all/public')
+  @ApiOperation({
+    summary:
+      'Récupérer toutes les structures sans missions (pour site vitrine)',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Liste des structures récupérée avec succès (sans missions, inclut le count des missions).',
+  })
+  getAllForPublic() {
+    return this.structuresService.getAllForPublic();
+  }
+
+  @GetThrottle()
+  @UseGuards(PublicGuard)
+  @Public()
   @Get('by-type-name/:typeName')
   @ApiOperation({ summary: 'Récupérer les structures par nom de type' })
-  @ApiParam({ name: 'typeName', type: String, description: 'Nom du type de structure' })
+  @ApiParam({
+    name: 'typeName',
+    type: String,
+    description: 'Nom du type de structure',
+  })
   @ApiResponse({
     status: 200,
     description: 'Liste des structures du type spécifié récupérée avec succès.',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Aucune structure trouvée pour ce type.' 
+  @ApiResponse({
+    status: 404,
+    description: 'Aucune structure trouvée pour ce type.',
   })
   getByTypeName(@Param('typeName') typeName: string) {
     return this.structuresService.getByTypeName(typeName);
