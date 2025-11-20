@@ -26,7 +26,12 @@ export class FilesService {
     });
   }
 
-  async updateFileContent(fileId: number, newContent: Buffer, userId: string) {
+  async updateFileContent(
+    fileId: number,
+    newContent: Buffer,
+    userId: string,
+    title?: string,
+  ) {
     const file = await this.prisma.file.findUnique({
       where: { file_id: fileId },
     });
@@ -39,12 +44,19 @@ export class FilesService {
       throw new ForbiddenException('Accès refusé');
     }
 
+    const updateData: any = {
+      file: newContent,
+      updated_at: new Date(),
+    };
+
+    // Mettre à jour le titre si fourni
+    if (title !== undefined) {
+      updateData.title = title;
+    }
+
     return this.prisma.file.update({
       where: { file_id: fileId },
-      data: {
-        file: newContent,
-        updated_at: new Date(),
-      },
+      data: updateData,
     });
   }
 
