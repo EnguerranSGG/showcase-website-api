@@ -44,6 +44,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma/seed-files ./dist/prisma/seed-files
+COPY --from=builder /app/scripts ./scripts
 
 # Changer les droits de propriété
 RUN chown -R appuser:app /app
