@@ -17,7 +17,8 @@
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "test:cov": "vitest run --coverage",
-    "seed": "node dist/prisma/seed.js"
+    "seed": "node dist/prisma/seed.js",
+    "create-maintenance": "tsx scripts/create-maintenance-user.ts"
   },
   "dependencies": {
     "@fastify/multipart": "^9.0.3",
