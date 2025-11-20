@@ -27,7 +27,10 @@ import { Role } from '@prisma/client';
 import { NotFoundException } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { Res } from '@nestjs/common';
-import { GetThrottle, WriteThrottle } from '../auth/decorators/throttle.decorator';
+import {
+  GetThrottle,
+  WriteThrottle,
+} from '../auth/decorators/throttle.decorator';
 
 import { lookup } from 'mime-types';
 
@@ -90,13 +93,14 @@ export class FilesController {
   @Roles(Role.ADMIN, Role.USER)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Mettre à jour un fichier (contenu uniquement)' })
+  @ApiOperation({ summary: 'Mettre à jour un fichier (contenu et/ou titre)' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
         file: { type: 'string', format: 'binary' },
+        title: { type: 'string' },
       },
     },
   })
@@ -105,11 +109,13 @@ export class FilesController {
   async update(@Param('id') id: number, @Req() req: any) {
     const parts = req.parts();
     let fileBuffer: Buffer | null = null;
-    console.log('req.isMultipart:', req.isMultipart());
+    let title: string | undefined;
 
     for await (const part of parts) {
       if (part.type === 'file') {
         fileBuffer = await part.toBuffer();
+      } else if (part.type === 'field' && part.fieldname === 'title') {
+        title = part.value;
       }
     }
 
@@ -121,6 +127,7 @@ export class FilesController {
       Number(id),
       fileBuffer,
       req.user.user_id,
+      title,
     );
   }
 
@@ -202,19 +209,19 @@ export class FilesController {
   @UseGuards(PublicGuard)
   @Public()
   @Get(':id/title')
-  @ApiOperation({ summary: 'Récupérer le titre d\'un fichier par ID' })
+  @ApiOperation({ summary: "Récupérer le titre d'un fichier par ID" })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Titre du fichier récupéré avec succès.',
     content: {
       'text/plain': {
         schema: {
           type: 'string',
-          example: 'Mon document important'
-        }
-      }
-    }
+          example: 'Mon document important',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Fichier non trouvé.' })
   async getTitleById(@Param('id') id: number, @Res() res: FastifyReply) {
