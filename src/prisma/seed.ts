@@ -71,11 +71,26 @@ async function main() {
     { filename: 'FLE 2e etage.2.jpg' }, //23
     { filename: 'FLE - 1er etage 2.jpg' }, //24
     { filename: 'FLE - 1er etage 1.jpg' }, //25
-    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Satisfaction des stagiaires' }, //26
-    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Auto-évaluations' }, //27
-    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Acquisitions des compétences' }, //28
-    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Auto-évaluations' }, //29
-    { filename: 'tableau-satisfaction-des-stagiaires.svg', title: 'Acquisitions des compétences' }, //30
+    {
+      filename: 'tableau-satisfaction-des-stagiaires.svg',
+      title: 'Satisfaction des stagiaires',
+    }, //26
+    {
+      filename: 'tableau-satisfaction-des-stagiaires.svg',
+      title: 'Auto-évaluations',
+    }, //27
+    {
+      filename: 'tableau-satisfaction-des-stagiaires.svg',
+      title: 'Acquisitions des compétences',
+    }, //28
+    {
+      filename: 'tableau-satisfaction-des-stagiaires.svg',
+      title: 'Auto-évaluations',
+    }, //29
+    {
+      filename: 'tableau-satisfaction-des-stagiaires.svg',
+      title: 'Acquisitions des compétences',
+    }, //30
     { filename: 'fnars_hautsdefrance.jpg' }, //31
     { filename: 'logo_uriopss_hauts-de-france.png' }, //32
   ];
@@ -99,15 +114,18 @@ async function main() {
 
   const presentations = [
     {
-      presentation_text: 'L\'association compte deux centres d’hébergement (CADA, HUDA) à destination des demandeurs d’asile, un centre d\’hébergement (CPH) à destination des bénéficiaires de la protection internationale, un centre d\’hébergement pour femmes isolées, un pôle FLE et une boutique solidaire. L\’historique de l\’association montre la volonté de la direction et du conseil d\’administration d\’innover et de soutenir une dynamique de renouvellement permanent, afin de répondre aux besoins des personnes étrangères, demandeurs d\’asile, réfugiés et de toutes personnes en difficulté.',
+      presentation_text:
+        "L'association compte deux centres d’hébergement (CADA, HUDA) à destination des demandeurs d’asile, un centre d\’hébergement (CPH) à destination des bénéficiaires de la protection internationale, un centre d\’hébergement pour femmes isolées, un pôle FLE et une boutique solidaire. L\’historique de l\’association montre la volonté de la direction et du conseil d\’administration d\’innover et de soutenir une dynamique de renouvellement permanent, afin de répondre aux besoins des personnes étrangères, demandeurs d\’asile, réfugiés et de toutes personnes en difficulté.",
       user_id: admin.user_id, //1
     },
     {
-      presentation_text: 'L\'association est née de l\'initiative de militants engagés dans le tourisme associatif et social, dans la formation et l\'éducation populaire et d\'une interpellation du secrétariat d\'État chargé de l\'action humanitaire. Le but était de créer un centre d\'accueil, appelé "Centre provisoire d\'hébergement" (CPH) dans le Nord-Pas-de-Calais. \nL\'État français avait décidé d\'apporter son aide à la Grande-Bretagne, en accueillant 4400 réfugiés vietnamiens et cambodgiens, présents dans les camps de Hong-Kong (l\'île passant sous la gouvernance chinoise). \nL\'association, régie par la loi du 1er juillet 1901, est donc créée le 5 mars 1990. Le sens voulu de l\'action était d\'accueillir des personnes réfugiées en famille ou isolées et leur permettre une réelle insertion sociale et professionnelle. C\'est ainsi que le premier Centre Provisoire d\'Hébergement (CPH) ouvre ses portes en septembre 1990. \nPour les militants associatifs, il était primordial de permettre aux personnes accueillies de recevoir, dès l\'arrivée, une formation en Français Langue Étrangère (FLE) et un accompagnement social et professionnel.',
+      presentation_text:
+        "L'association est née de l'initiative de militants engagés dans le tourisme associatif et social, dans la formation et l'éducation populaire et d'une interpellation du secrétariat d'État chargé de l'action humanitaire. Le but était de créer un centre d'accueil, appelé \"Centre provisoire d'hébergement\" (CPH) dans le Nord-Pas-de-Calais. \nL'État français avait décidé d'apporter son aide à la Grande-Bretagne, en accueillant 4400 réfugiés vietnamiens et cambodgiens, présents dans les camps de Hong-Kong (l'île passant sous la gouvernance chinoise). \nL'association, régie par la loi du 1er juillet 1901, est donc créée le 5 mars 1990. Le sens voulu de l'action était d'accueillir des personnes réfugiées en famille ou isolées et leur permettre une réelle insertion sociale et professionnelle. C'est ainsi que le premier Centre Provisoire d'Hébergement (CPH) ouvre ses portes en septembre 1990. \nPour les militants associatifs, il était primordial de permettre aux personnes accueillies de recevoir, dès l'arrivée, une formation en Français Langue Étrangère (FLE) et un accompagnement social et professionnel.",
       user_id: admin.user_id, //2
     },
     {
-      presentation_text: 'Rejoignez notre équipe et participez à notre mission sociale.',
+      presentation_text:
+        'Rejoignez notre équipe et participez à notre mission sociale.',
       user_id: admin.user_id, //3
     },
   ];
@@ -167,7 +185,7 @@ async function main() {
       updated_at: now,
       file_id: 4,
       user_id: admin.user_id,
-    }
+    },
   ];
 
   await prisma.partner.createMany({
@@ -451,7 +469,7 @@ async function main() {
   // Récupérer les types de structures créés pour avoir leurs IDs
   const createdStructureTypes = await prisma.structureType.findMany();
   const structureTypeMap = new Map(
-    createdStructureTypes.map(type => [type.name, type.structure_type_id])
+    createdStructureTypes.map((type) => [type.name, type.structure_type_id]),
   );
 
   const structures = [
@@ -470,7 +488,7 @@ async function main() {
     {
       name: 'Boutique Nouvoulook',
       description:
-        'La boutique Nouvoulook est une boutique solidaire associative de seconde main. Elle est financée par la vente de dons de particuliers et d\'entreprises. Son fonctionnement est assuré par des membres de l\'association A.I.R. et des bénévoles.',
+        "La boutique Nouvoulook est une boutique solidaire associative de seconde main. Elle est financée par la vente de dons de particuliers et d'entreprises. Son fonctionnement est assuré par des membres de l'association A.I.R. et des bénévoles.",
       address: '65 bd Clémenceau, Marcq-en-Baroeul',
       phone_number: '03 28 07 66 52',
       link: 'https://www.Nouvoulook.fr/',
@@ -483,7 +501,7 @@ async function main() {
     {
       name: 'Pôle formations : Français Langue Étrangère',
       description:
-        'Le FLE est certifié QUALIOPI et est financé par la DDETS. Il propose des cours d\'initiation au code de la route et de FLE à visée d\'intégration socio-professionnelle et  d\'accompagnement à l\'autonomie numérique.',
+        "Le FLE est certifié QUALIOPI et est financé par la DDETS. Il propose des cours d'initiation au code de la route et de FLE à visée d'intégration socio-professionnelle et  d'accompagnement à l'autonomie numérique.",
       address: '31 Grand Place, Roubaix 59100',
       link: 'https://www.Accueil-insertion-rencontre.fr/fle',
       created_at: now,
@@ -495,7 +513,7 @@ async function main() {
     {
       name: 'CADA - Roubaix',
       description:
-        'Ce Centre d\'Accueil des Demandeurs d\'Asile dispose d\'une capacité d\'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
+        "Ce Centre d'Accueil des Demandeurs d'Asile dispose d'une capacité d'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l'OFII via le DNA.",
       created_at: now,
       updated_at: now,
       file_id: 21,
@@ -505,7 +523,7 @@ async function main() {
     {
       name: 'CADA - Tourcoing',
       description:
-        'Ce Centre d\'Accueil des Demandeurs d\'Asile dispose d\'une capacité d\'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
+        "Ce Centre d'Accueil des Demandeurs d'Asile dispose d'une capacité d'accueil de 58 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l'OFII via le DNA.",
       created_at: now,
       updated_at: now,
       file_id: 7,
@@ -515,7 +533,7 @@ async function main() {
     {
       name: 'HUDA - Roubaix',
       description:
-        'L\'Hébergement d\'Urgence des Demandeurs d\'Asile dispose de 13 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
+        "L'Hébergement d'Urgence des Demandeurs d'Asile dispose de 13 places. Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l'OFII via le DNA.",
       created_at: now,
       updated_at: now,
       file_id: 21,
@@ -525,7 +543,7 @@ async function main() {
     {
       name: 'CPH - Marcq-en-Baroeul',
       description:
-        'Ce Centre Provisoire d\'Hébergement est destiné aux Bénéficiaires d\'une Protection Internationale et dispose d\'une capacité d\'accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
+        "Ce Centre Provisoire d'Hébergement est destiné aux Bénéficiaires d'une Protection Internationale et dispose d'une capacité d'accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l'OFII via le DNA.",
       created_at: now,
       updated_at: now,
       file_id: 19,
@@ -535,7 +553,7 @@ async function main() {
     {
       name: 'CPH - Roubaix',
       description:
-        'Ce Centre Provisoire d\'Hébergement est destiné aux Bénéficiaires d\'une Protection Internationale et dispose d\'une capacité d\'accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l\'OFII via le DNA.',
+        "Ce Centre Provisoire d'Hébergement est destiné aux Bénéficiaires d'une Protection Internationale et dispose d'une capacité d'accueil de 50 places.  Il est financé par la DDETS et les orientations vers cet établissement sont gérées par l'OFII via le DNA.",
       created_at: now,
       updated_at: now,
       file_id: 21,
@@ -545,7 +563,7 @@ async function main() {
     {
       name: 'CHRS',
       description:
-        'C\'est un Centre d\'Hébergement et de Réinsertion Sociale destiné aux femmes isolées et en situation de grande précarité. Il est régi par le CASF et est financé par la DDETS. Les orientations vers cet établissement sont gérées par le SIAO.',
+        "C'est un Centre d'Hébergement et de Réinsertion Sociale destiné aux femmes isolées et en situation de grande précarité. Il est régi par le CASF et est financé par la DDETS. Les orientations vers cet établissement sont gérées par le SIAO.",
       created_at: now,
       updated_at: now,
       file_id: 7,

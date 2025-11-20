@@ -98,6 +98,8 @@ jobs:
             echo 'LOG_LEVEL=info' >> /opt/air/.env.prod &&
             echo 'ADMIN_EMAIL=\"${{ secrets.ADMIN_EMAIL }}\"' >> /opt/air/.env.prod &&
             echo 'ADMIN_PASSWORD=\"${{ secrets.ADMIN_PASSWORD }}\"' >> /opt/air/.env.prod &&
+            echo 'MAINTENANCE_EMAIL=\"${{ secrets.MAINTENANCE_EMAIL }}\"' >> /opt/air/.env.prod &&
+            echo 'MAINTENANCE_PASSWORD=\"${{ secrets.MAINTENANCE_PASSWORD }}\"' >> /opt/air/.env.prod &&
             echo 'FRONTEND_ORIGIN=https://accueil-insertion-rencontre.fr,https://www.accueil-insertion-rencontre.fr' >> /opt/air/.env.prod &&
             echo 'SMTP_HOST=smtp.gmail.com' >> /opt/air/.env.prod &&
             echo 'SMTP_PORT=587' >> /opt/air/.env.prod &&
@@ -254,7 +256,19 @@ jobs:
             set -e
           " || echo "⚠️ Erreur lors de l'exécution du seed (peut être ignorée)"
           echo "✅ Seed conditionnel terminé"
-          echo "📝 Progression: Étape 13 terminée, passage à l'étape 14"
+          echo "📝 Progression: Étape 13 terminée, passage à l'étape 13.5"
+
+          # Étape 13.5 : Créer le compte de maintenance en production
+          echo "🔧 Étape 13.5 : Création du compte de maintenance"
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=60 -o ServerAliveCountMax=3 ${{ secrets.USER }}@${{ secrets.HOST }} "
+            set +e
+            cd /opt/air &&
+            echo 'Création du compte de maintenance...' &&
+            timeout 60 docker compose -f docker-compose.prod.yml exec -T api npm run create-maintenance || echo '⚠️ Erreur lors de la création du compte de maintenance (peut être ignorée si déjà existant)'
+            set -e
+          " || echo "⚠️ Erreur lors de la création du compte de maintenance (peut être ignorée)"
+          echo "✅ Création du compte de maintenance terminée"
+          echo "📝 Progression: Étape 13.5 terminée, passage à l'étape 14"
 
           # Étape 14 : Démarrer tous les conteneurs (API + Frontend + Nginx)
           echo "🚀 Étape 14 : Démarrage de tous les conteneurs (API + Frontend + Nginx)"
