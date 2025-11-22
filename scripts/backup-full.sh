@@ -20,7 +20,13 @@ mkdir -p "$BACKUP_PATH"
 
 # 1. Backup de la base de données
 echo "💾 Backup de la base de données..."
-./scripts/backup-db.sh showcase-api-db-1 "$BACKUP_PATH"
+# Détecter automatiquement le nom du conteneur DB
+DB_CONTAINER=$(docker ps --format "{{.Names}}" | grep -E "(air-db-1|showcase-api-db-1|db)" | head -1)
+if [ -z "$DB_CONTAINER" ]; then
+    echo "⚠️  Aucun conteneur DB trouvé, utilisation du nom par défaut: air-db-1"
+    DB_CONTAINER="air-db-1"
+fi
+./scripts/backup-db.sh "$DB_CONTAINER" "$BACKUP_PATH"
 
 # 2. Backup des fichiers uploadés (si ils existent)
 echo "📁 Backup des fichiers uploadés..."

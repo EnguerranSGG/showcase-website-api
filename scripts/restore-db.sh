@@ -7,7 +7,15 @@ set -e
 
 # Configuration
 BACKUP_FILE=${1}
-CONTAINER_NAME=${2:-"showcase-api-db-1"}
+# Détecter automatiquement le nom du conteneur DB si non fourni
+if [ -z "$2" ]; then
+    CONTAINER_NAME=$(docker ps --format "{{.Names}}" | grep -E "(air-db-1|showcase-api-db-1|db)" | head -1)
+    if [ -z "$CONTAINER_NAME" ]; then
+        CONTAINER_NAME="air-db-1"
+    fi
+else
+    CONTAINER_NAME=$2
+fi
 
 if [ -z "$BACKUP_FILE" ]; then
     echo "❌ Erreur: Veuillez spécifier un fichier de backup"
@@ -47,7 +55,8 @@ docker compose -f docker-compose.prod.yml stop api || true
 
 # Restaurer la base de données
 echo "💾 Restauration de la base de données..."
-gunzip -c "$BACKUP_FILE" | docker exec -i "$CONTAINER_NAME" psql -U air-admin -d air-db
+echo "🐳 Utilisation du conteneur: $CONTAINER_NAME"
+gunzip -c "$BACKUP_FILE" | docker exec -i "$CONTAINER_NAME" psql -U postgres -d air_db
 
 # Redémarrer l'API
 echo "🚀 Redémarrage de l'API..."
