@@ -6,7 +6,15 @@
 set -e
 
 # Configuration
-CONTAINER_NAME=${1:-"showcase-api-db-1"}
+# Détecter automatiquement le nom du conteneur DB si non fourni
+if [ -z "$1" ]; then
+    CONTAINER_NAME=$(docker ps --format "{{.Names}}" | grep -E "(air-db-1|showcase-api-db-1|db)" | head -1)
+    if [ -z "$CONTAINER_NAME" ]; then
+        CONTAINER_NAME="air-db-1"
+    fi
+else
+    CONTAINER_NAME=$1
+fi
 BACKUP_DIR=${2:-"/backups/postgres"}
 RETENTION_DAYS=30
 DATE=$(date +%Y%m%d_%H%M%S)
@@ -27,9 +35,10 @@ fi
 
 # Effectuer le backup avec pg_dump
 echo "💾 Création du backup..."
+echo "🐳 Utilisation du conteneur: $CONTAINER_NAME"
 docker exec "$CONTAINER_NAME" pg_dump \
-    -U air-admin \
-    -d air-db \
+    -U postgres \
+    -d air_db \
     --verbose \
     --clean \
     --if-exists \

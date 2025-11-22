@@ -18,11 +18,11 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Check SSL certificate expiry
         run: |
-          EXPIRY_DATE=$(ssh -o StrictHostKeyChecking=no ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
+          EXPIRY_DATE=$(ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             openssl x509 -in /etc/letsencrypt/live/accueil-insertion-rencontre.fr/cert.pem -noout -dates | grep notAfter | cut -d= -f2
           ")
 
@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "🔄 SSL certificate expires in less than 30 days, renewing..."
 
-          ssh -o StrictHostKeyChecking=no ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
             ./scripts/renew-ssl.sh
           "

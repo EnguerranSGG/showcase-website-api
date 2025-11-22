@@ -18,26 +18,27 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Create database backup
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
             ./scripts/backup-full.sh github-actions-$(date +%Y%m%d-%H%M%S)
           "
 
       - name: Clean old backups (keep last 30 days)
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
-            find /backups/air -name '*.sql.gz' -mtime +30 -delete
-            find /backups/air -name '*.tar.gz' -mtime +30 -delete
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            find /backups/air-app -name '*.sql.gz' -mtime +30 -delete
+            find /backups/air-app -name '*.tar.gz' -mtime +30 -delete
+            find /backups/postgres -name '*.sql.gz' -mtime +30 -delete
           "
 
       - name: Verify backup
         run: |
-          BACKUP_COUNT=$(ssh -o StrictHostKeyChecking=no ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
-            ls -1 /backups/air/*.sql.gz | wc -l
+          BACKUP_COUNT=$(ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            ls -1 /backups/air-app/*.tar.gz 2>/dev/null | wc -l
           ")
 
           if [ "$BACKUP_COUNT" -gt 0 ]; then
