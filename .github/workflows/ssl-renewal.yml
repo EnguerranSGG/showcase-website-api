@@ -20,18 +20,34 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      - name: Diagnostic - Check SSH user
+        run: |
+          echo "🔍 Diagnostic de l'utilisateur SSH..."
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            echo 'Utilisateur actuel: \$(whoami)'
+            echo 'UID: \$(id -u)'
+            echo 'GID: \$(id -g)'
+            echo 'Groupes: \$(groups)'
+            echo 'Permissions sudo:'
+            sudo -l 2>&1 | head -5 || echo 'Pas de permissions sudo ou sudo non configuré'
+          "
+
       - name: Check SSL certificate expiry
         run: |
           EXPIRY_DATE=$(ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
-            openssl x509 -in /etc/letsencrypt/live/accueil-insertion-rencontre.fr/cert.pem -noout -dates | grep notAfter | cut -d= -f2
+            sudo openssl x509 -in /etc/letsencrypt/live/accueil-insertion-rencontre.fr/cert.pem -noout -dates 2>/dev/null | grep notAfter | cut -d= -f2 || echo ''
           ")
 
-          EXPIRY_TIMESTAMP=$(date -d "$EXPIRY_DATE" +%s)
-          CURRENT_TIMESTAMP=$(date +%s)
-          DAYS_UNTIL_EXPIRY=$(( (EXPIRY_TIMESTAMP - CURRENT_TIMESTAMP) / 86400 ))
-
-          echo "Certificate expires in $DAYS_UNTIL_EXPIRY days"
-          echo "DAYS_UNTIL_EXPIRY=$DAYS_UNTIL_EXPIRY" >> $GITHUB_ENV
+          if [ -z "$EXPIRY_DATE" ]; then
+            echo "⚠️  Could not read certificate expiry date. Assuming renewal needed."
+            echo "DAYS_UNTIL_EXPIRY=0" >> $GITHUB_ENV
+          else
+            EXPIRY_TIMESTAMP=$(date -d "$EXPIRY_DATE" +%s 2>/dev/null || echo "0")
+            CURRENT_TIMESTAMP=$(date +%s)
+            DAYS_UNTIL_EXPIRY=$(( (EXPIRY_TIMESTAMP - CURRENT_TIMESTAMP) / 86400 ))
+            echo "Certificate expires in $DAYS_UNTIL_EXPIRY days"
+            echo "DAYS_UNTIL_EXPIRY=$DAYS_UNTIL_EXPIRY" >> $GITHUB_ENV
+          fi
 
       - name: Renew SSL certificate if needed
         if: env.DAYS_UNTIL_EXPIRY < 30
@@ -40,7 +56,7 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            bash scripts/renew-ssl.sh
+            sudo bash scripts/renew-ssl.sh
           "
 
       - name: Skip renewal if not needed
