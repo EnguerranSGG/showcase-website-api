@@ -20,11 +20,18 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      - name: Ensure backup scripts are executable
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
+            cd /opt/air &&
+            chmod +x scripts/backup-full.sh scripts/backup-db.sh scripts/restore-db.sh 2>/dev/null || true
+          "
+
       - name: Create database backup
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            ./scripts/backup-full.sh github-actions-$(date +%Y%m%d-%H%M%S)
+            bash scripts/backup-full.sh github-actions-$(date +%Y%m%d-%H%M%S)
           "
 
       - name: Clean old backups (keep last 30 days)
