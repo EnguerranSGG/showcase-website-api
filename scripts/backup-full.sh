@@ -15,14 +15,9 @@ RETENTION_DAYS=30
 echo "🔄 Début du backup complet de l'application AIR..."
 echo "📁 Répertoire de backup: $BACKUP_PATH"
 
-# Créer le répertoire de backup (avec sudo si nécessaire)
-if [ "$EUID" -eq 0 ]; then
-    mkdir -p "$BACKUP_PATH"
-else
-    sudo mkdir -p "$BACKUP_PATH"
-    # S'assurer que l'utilisateur actuel peut écrire dans le répertoire
-    sudo chown -R "$(whoami):$(whoami)" "$BACKUP_DIR" 2>/dev/null || sudo chmod -R 755 "$BACKUP_DIR"
-fi
+# Créer le répertoire de backup
+# Note: Le répertoire /backups doit être créé manuellement avec les bonnes permissions
+mkdir -p "$BACKUP_PATH"
 
 # 1. Backup de la base de données
 echo "💾 Backup de la base de données..."

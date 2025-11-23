@@ -20,14 +20,9 @@ RETENTION_DAYS=30
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="air_db_backup_${DATE}.sql.gz"
 
-# Créer le répertoire de backup s'il n'existe pas (avec sudo si nécessaire)
-if [ "$EUID" -eq 0 ]; then
-    mkdir -p "$BACKUP_DIR"
-else
-    sudo mkdir -p "$BACKUP_DIR"
-    # S'assurer que l'utilisateur actuel peut écrire dans le répertoire
-    sudo chown -R "$(whoami):$(whoami)" "$BACKUP_DIR" 2>/dev/null || sudo chmod -R 755 "$BACKUP_DIR"
-fi
+# Créer le répertoire de backup s'il n'existe pas
+# Note: Le répertoire /backups doit être créé manuellement avec les bonnes permissions
+mkdir -p "$BACKUP_DIR"
 
 echo "🔄 Début du backup de la base de données..."
 echo "📁 Répertoire de backup: $BACKUP_DIR"
