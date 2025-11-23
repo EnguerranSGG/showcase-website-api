@@ -40,7 +40,12 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "
             cd /opt/air &&
-            ./scripts/renew-ssl.sh
+            # Utiliser sudo si nécessaire (fonctionne même si l'utilisateur est root)
+            if [ \"\$(id -u)\" -eq 0 ]; then
+              bash scripts/renew-ssl.sh
+            else
+              sudo bash scripts/renew-ssl.sh
+            fi
           "
 
       - name: Skip renewal if not needed
